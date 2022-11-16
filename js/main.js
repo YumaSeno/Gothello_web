@@ -7,11 +7,10 @@ import {DrawablePiece} from "./drawablePiece.js";
 let player1 = new Player();
 let player2 = new Player();
 let currentPlayer = player1;
-var game = boardInitialize(player1, player2);
+var game = gothelloInitialize(player1, player2);
 
 document.getElementById("cancel_button").addEventListener("click", () => {
-    console.log("asd");
-    game = boardInitialize(player1, player2);
+    game = gothelloInitialize(player1, player2);
 })
 
 function onPieceClicked(e){
@@ -20,9 +19,7 @@ function onPieceClicked(e){
     player2.onClicked(pieceElement.dataset.x, pieceElement.dataset.y)
 }
 
-function boardInitialize(player1, player2){
-    let gothello = null;
-
+function gothelloInitialize(player1, player2){
     const board = [];
     const boardElement = document.getElementById("board");
     while (boardElement.firstChild) boardElement.removeChild(boardElement.firstChild);
@@ -58,5 +55,5 @@ function boardInitialize(player1, player2){
         board.push(row);
     }
 
-    gothello = new Gothello(player1, player2, (x,y) => board[x][y]);
+    return new Gothello(player1, player2, (x,y) => board[x][y]);
 }
