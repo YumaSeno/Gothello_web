@@ -1,11 +1,12 @@
 'use strict';
-import {Gothello} from "./gothello.js";
-import {Player} from "./player.js";
-import {DrawablePiece} from "./drawablePiece.js";
+import { Gothello } from "./gothello.js";
+import { Player } from "./player.js";
+import { DrawablePiece } from "./drawablePiece.js";
+import { DummyPlayer } from "./dummyPlayer.js";
 
 
 let player1 = new Player();
-let player2 = new Player();
+let player2 = new DummyPlayer();
 let currentPlayer = player1;
 var game = gothelloInitialize(player1, player2);
 
@@ -15,8 +16,8 @@ document.getElementById("cancel_button").addEventListener("click", () => {
 
 function onPieceClicked(e){
     const pieceElement = e.currentTarget;
-    player1.onClicked(pieceElement.dataset.x, pieceElement.dataset.y)
-    player2.onClicked(pieceElement.dataset.x, pieceElement.dataset.y)
+    player1.putPiece(pieceElement.dataset.x, pieceElement.dataset.y)
+    //player2.putPiece(pieceElement.dataset.x, pieceElement.dataset.y)
 }
 
 function gothelloInitialize(player1, player2){
