@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="jp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, wclassth=device-wclassth, initial-scale=1.0、minimum-scale=1.0">
+    
+    <title>Gothello</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@300&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="header">
+        <h1>Gothello</h1>
+        <div id="cancel_button"></div>
+    </div>
+    <div id="board"></div>
+    <script>
+        (()=>{
+            let height = document.documentElement.clientHeight;
+            let width = document.body.clientWidth;
+            document.body.style.height = height + "px"
+            document.body.style.width = width + "px"
+            document.documentElement.style.setProperty('--vh', height/100+"px");
+            document.documentElement.style.setProperty('--vw', width/100+"px");
+            document.documentElement.style.setProperty('--vmin', (width>height ? height : width)/100+"px");
+        })();
+    </script>
+    <script src="./main.js" type="module"></script>
+</body>
+</html>

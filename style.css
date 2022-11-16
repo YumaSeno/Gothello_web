@@ -1,0 +1,154 @@
+:root {
+    --vw: 1vw;
+    --vh: 1vh;
+    --vmin: 1vh;
+}
+
+body{
+    margin: 0;
+    display: block;
+    position: relative;
+    background: #dedede;
+    color: #6a6a6a;
+    width: 100%;
+    height: 100%;
+    font-family: 'M PLUS 1p', sans-serif;
+    border-top:1px solid transparent;
+    box-sizing: border-box;
+}
+
+#header{
+    display: block;
+    position: relative;
+    width: calc(100 * var(--vh, vh));
+    max-width: calc(95 * var(--vw, vw));
+    height: calc(6.5 * var(--vh, vh));
+    left: 50%;
+    margin-top: 1.5%;
+    transform: translate(-50%,0);
+    border-radius: 1000px;
+    box-shadow: #c1c1c1 4px 4px 4px 3px, 
+                #eeeeee -4px -4px 4px 3px;
+}
+#header h1{
+    display: block;
+    position: absolute;
+    font-weight: bolder;
+    font-size: calc(3 * var(--vh, vh));
+    margin: 0;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+}
+#header #cancel_button{
+    display: block;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    height: 90%;
+    transform: translate(0, -50%);
+    aspect-ratio: 1;
+    cursor: pointer;
+    border-radius: 1000px;
+    background: #eabbbb;
+    box-shadow: #c1c1c1 2px 2px 2px 1px, 
+                #eeeeee -2px -2px 2px 1px;
+}
+#cancel_button::before, #cancel_button::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2%;
+  height: 50%;
+  background: #6a6a6a;
+}
+#cancel_button::before {
+  transform: translate(-50%,-50%) rotate(45deg);
+}
+ 
+#cancel_button::after {
+  transform: translate(-50%,-50%) rotate(-45deg);
+}
+
+
+#board{
+    position: absolute;
+    width: calc(82 * var(--vh, vh));
+    height: calc(82 * var(--vh, vh));
+    max-width: calc(95 * var(--vw, vw));
+    max-height: calc(95 * var(--vw, vw));
+    left: 50%;
+    top: 55%;
+    padding: calc(0.5 * var(--vh, vh));
+    transform: translate(-50%,-50%);
+    display: flex;
+    flex-flow: column;
+    justify-content: space-around;
+    box-sizing: border-box;
+    border-radius: 15px;
+    box-shadow: #c1c1c1 4px 4px 4px 3px, 
+                #eeeeee -4px -4px 4px 3px;
+}
+.row{
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+.piece{
+    position: relative;
+    display: block;
+    background: #dedede;
+    border-radius: 10000px;
+    width: 10%;
+    padding-top: 10%;
+    cursor: pointer;
+    /*border: solid 1px #ababab;*/
+}
+.black{
+    background: #767676;
+}
+.white{
+    background: #ffffff;
+}
+.sole::after{
+    content: "";
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 30%;
+    height: 30%;
+    border-radius: 100%;
+    transform: translate(-50%,-50%);
+}
+.black.sole::after{
+    background-color: #ffffff;
+}
+.white.sole::after{
+    background-color: #848484;
+}
+
+
+.row_separator{
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+.separator{
+    position: relative;
+    display: block;
+    height: 100%;
+    width: calc(.15 * var(--vh, vh));
+    background: #cbcbcb;
+    /*box-shadow: #b5b5b5 -1px -1px 2px 1px,
+                #fdfdfd 1px 1px 2px 1px;*/
+}
+.row_separator .separator{
+    width: 10%;
+    height: calc(.2 * var(--vh, vh));
+}
+.row .separator{
+    height: 100%;
+    width: calc(.2 * var(--vh, vh));
+}
