@@ -7,18 +7,12 @@ import { DummyPlayer } from "./dummyPlayer.js";
 
 let player1 = new Player();
 let player2 = new DummyPlayer();
-let currentPlayer = player1;
+let operablePlayers = [player1];
 var game = gothelloInitialize(player1, player2);
 
 document.getElementById("cancel_button").addEventListener("click", () => {
     game = gothelloInitialize(player1, player2);
 })
-
-function onPieceClicked(e){
-    const pieceElement = e.currentTarget;
-    player1.putPiece(pieceElement.dataset.x, pieceElement.dataset.y)
-    //player2.putPiece(pieceElement.dataset.x, pieceElement.dataset.y)
-}
 
 function gothelloInitialize(player1, player2){
     const board = [];
@@ -57,4 +51,11 @@ function gothelloInitialize(player1, player2){
     }
 
     return new Gothello(player1, player2, (x,y) => board[x][y]);
+}
+
+function onPieceClicked(e){
+    let currentPlayer = null;
+    operablePlayers.forEach(player => {if (player.gothello) currentPlayer = player;});
+    const pieceElement = e.currentTarget;
+    if (currentPlayer) currentPlayer.putPiece(pieceElement.dataset.x, pieceElement.dataset.y);
 }
