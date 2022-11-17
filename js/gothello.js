@@ -17,7 +17,7 @@ export class Piece{
 }
 
 export class Gothello{
-    turn = 0;
+    turn = 1;
     board = [];
     onSettled = (player)=>{};
     _players = [];
@@ -69,6 +69,7 @@ export class Gothello{
 
         this._players[opponentnum-1].switchTurn(x, y);
         this._turnPlayer = this._players[opponentnum-1];
+        this.turn++;
     }
 
     _placeNewPiece(playernum, x, y){
@@ -76,12 +77,12 @@ export class Gothello{
         const opponentnum = playernum == 1 ? 2 : 1;
 
         board[x][y] = playernum;
+        if(this.turn == 2)board[x][y] += 2;
 
         let turnedOver = false;
         try {
             turnedOver = this._turnOver(playernum, x, y, board);
-        } catch (error) {
-            console.log(error);
+        } catch {
             return false;
         }
 
@@ -117,7 +118,7 @@ export class Gothello{
 
                     if (board[_x][_y] == opponentnum + 2){haveSole = true;}
                     if ((board[_x][_y] - 1) % 2 + 1 == playernum){
-                        if (haveSole) throw new Error();
+                        if (haveSole) throw new Error("Sole cannot be placed between");
                         isTurnOver = true;
                         break;
                     }
@@ -130,7 +131,6 @@ export class Gothello{
                 while(stack.length > 0){
                     turnedOver = true;
                     let xy = stack.pop();
-                    console.log(xy);
                     board[xy.x][xy.y] = playernum;
                 }
             }

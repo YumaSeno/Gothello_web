@@ -3,15 +3,13 @@ import { Gothello } from "./gothello.js";
 import { Player, DummyPlayer } from "./player.js";
 import { DrawablePiece } from "./drawablePiece.js";
 
-let player1 = new Player();
-let player2 = new DummyPlayer();
-let operablePlayers = [player1];
+let player1 = new Player("player1");
+let player2 = new Player("player2");
+let operablePlayers = [player1, player2];
 var gothello = gothelloInitialize(player1, player2);
 
 gothello.onSettled = player => {
-    if(player == player1){
-        setTimeout(()=>alert("You Win!"), 200)
-    }
+    setTimeout(()=>alert(`${player.name} Win!`), 200)
 }
 
 document.getElementById("cancel_button").addEventListener("click", () => {
