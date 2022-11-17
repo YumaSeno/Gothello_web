@@ -8,6 +8,12 @@ let player2 = new DummyPlayer();
 let operablePlayers = [player1];
 var gothello = gothelloInitialize(player1, player2);
 
+gothello.onSettled = player => {
+    if(player == player1){
+        setTimeout(()=>alert("You Win!"), 200)
+    }
+}
+
 document.getElementById("cancel_button").addEventListener("click", () => {
     gothello = gothelloInitialize(player1, player2);
 })

@@ -19,6 +19,7 @@ export class Piece{
 export class Gothello{
     turn = 0;
     board = [];
+    onSettled = (player)=>{};
     _players = [];
     _turnPlayer = null;
     
@@ -72,48 +73,119 @@ export class Gothello{
 
     _placeNewPiece(playernum, x, y){
         const board = this._getBoardInt();
-        const boardBackup = this._getBoardInt();
         const opponentnum = playernum == 1 ? 2 : 1;
 
         board[x][y] = playernum;
+
+        let turnedOver = false;
+        try {
+            turnedOver = this._turnOver(playernum, x, y, board);
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+
+        let victory = this._isVictory(playernum, board);
+
+        if(turnedOver && victory)return false;
+        
+        this._reflectBoardInt(board);
+
+        if(victory){
+            this._settled();
+            return false;
+        }
+
+        return true;
+    }
+
+    _turnOver(playernum, x, y, board){
+        let turnedOver = false;
+        const opponentnum = playernum == 1 ? 2 : 1;
         const directions = [0,1,-1];
-        directions.forEach(dire_y => {
-            directions.forEach(dire_x => {
-                if(dire_y == 0 && dire_x == 0) return;
-                
+        for (const dire_y of directions) {
+            for (const dire_x of directions) {
+                if(dire_y == 0 && dire_x == 0) continue;
                 const stack = [];
 
                 let isTurnOver = false;
-                let xx = x + dire_x;
-                let yy = y + dire_y;
-                while(xx >= 0 && yy >= 0 && xx < board[0].length && yy < board.length){
-                    if (board[xx][yy] == opponentnum + 2){break;}
-                    if (board[xx][yy] == 0){break;}
-                    if ((board[xx][yy] - 1) % 2 + 1 == playernum){
+                let _x = x + dire_x;
+                let _y = y + dire_y;
+                let haveSole = false;
+                while(_x >= 0 && _y >= 0 && _x < board[0].length && _y < board.length){
+                    if (board[_x][_y] == 0){break;}
+
+                    if (board[_x][_y] == opponentnum + 2){haveSole = true;}
+                    if ((board[_x][_y] - 1) % 2 + 1 == playernum){
+                        if (haveSole) throw new Error();
                         isTurnOver = true;
                         break;
                     }
-                    stack.push({x: xx, y: yy});
+                    stack.push({x: _x, y: _y});
 
-                    xx += dire_x;
-                    yy += dire_y;
+                    _x += dire_x;
+                    _y += dire_y;
                 }
-
-                console.log(stack)
-
-                if(!isTurnOver)return;
-
+                if(!isTurnOver)continue;
                 while(stack.length > 0){
+                    turnedOver = true;
                     let xy = stack.pop();
                     console.log(xy);
                     board[xy.x][xy.y] = playernum;
                 }
-            });
-        });
-        console.log(board);
-        this.board[x][y].setState(playernum);
+            }
+        }
 
-        return true;
+        return turnedOver;
+    }
+
+    _isVictory(playernum, board){
+        const opponentnum = playernum == 1 ? 2 : 1;
+        const directions = [0,1,-1];
+        for (let y = 0; y < board.length; y++) {
+            for (let x = 0; x < board[y].length; x++) {
+         
+                for (const dire_y of directions) {
+                    for (const dire_x of directions) {
+                        if(dire_y == 0 && dire_x == 0) continue;
+                        let count = 0;
+                        let _x = x + dire_x;
+                        let _y = y + dire_y;
+                        while(_x >= 0 && _y >= 0 && _x < board[0].length && _y < board.length){
+                            if ((board[_x][_y] != 0) && ((board[_x][_y] - 1) % 2 + 1 != opponentnum)){
+                                count++;
+    
+                                if(count >= 5){
+                                    return true;
+                                }
+                            }else{
+                                count = 0;
+                            }
+
+                            _x += dire_x;
+                            _y += dire_y;
+                        }
+                    }
+                }       
+            }
+        }
+        return false;
+    }
+
+    _reflectBoardInt(board){
+        const boardBackup = this._getBoardInt();
+
+        for(let _x = 0; _x < this.board.length; _x++){
+            for(let _y = 0; _y < this.board.length; _y++){
+                if(board[_x][_y] != this.board[_x][_y].getState())
+                this.board[_x][_y].setState(board[_x][_y]);
+            }
+        }
+    }
+
+    _settled(){
+        this.onSettled(this._turnPlayer);
+        this._turnPlayer = null;
     }
 
     _getBoardInt(){
