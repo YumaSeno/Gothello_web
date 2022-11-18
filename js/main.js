@@ -26,16 +26,27 @@ class Game{
         const removeButtonConcedEvent = ()=>document.getElementById("cancel_button").removeEventListener("click", _conced);
         document.getElementById("cancel_button").addEventListener("click", _conced);
         
-        document.getElementById("player_name").innerText = "turn : "+player1.name;
+        document.getElementById("player_name").innerText = player1.name;
+        document.getElementById("player_name").className = "black";
+
+        let isSettled = false;
 
         this.operablePlayers = operablePlayers;
         this.gothello = this.gothelloInitialize(player1, player2);
         this.gothello.onPlacesPiece = (x, y) => {
-            document.getElementById("player_name").innerText = "turn : "+this.gothello.getTurnPlayer().name;
+            if(!isSettled)document.getElementById("player_name").innerText = this.gothello.getTurnPlayer().name;
+            if(this.gothello.getTurnPlayer() == player1){
+                document.getElementById("player_name").className = "black";
+            }else{
+                document.getElementById("player_name").className = "white";
+            }
         }
         this.gothello.onSettled = player => {
             removeButtonConcedEvent()
-            setTimeout(onSettled(player), 100);
+            isSettled = true;
+            setTimeout(()=>{
+                onSettled(player);
+            }, 100);
         }
     }
 
@@ -90,7 +101,7 @@ const OPERATION_ELEMENT = {
         document.getElementById("games_outer").style.display = "none";
         document.getElementById("cancel_button").style.display = "block";
         document.getElementById("board").style.display = "flex";
-        document.getElementById("player_name").style.display = "block";
+        document.getElementById("player_name").style.display = "flex";
     }, 
     undoElement(){
         document.getElementById("player_name").style.display = "none";
@@ -99,14 +110,14 @@ const OPERATION_ELEMENT = {
         document.getElementById("games_outer").style.display = "block";
         document.getElementById("message").innerText = "";
         document.getElementById("message").style.display = "none";
-        document.getElementById("cancel_button").removeEventListener("click", this.undoElement)
+        document.getElementById("cancel_button").removeEventListener("click", OPERATION_ELEMENT.undoElement);
         
-        location.reload();
+        //location.reload();
     }, 
     onSettled(message){
         document.getElementById("message").innerText = message;
         document.getElementById("message").style.display = "flex";
-        document.getElementById("cancel_button").addEventListener("click", this.undoElement);
+        document.getElementById("cancel_button").addEventListener("click", OPERATION_ELEMENT.undoElement);
     },
 }
 

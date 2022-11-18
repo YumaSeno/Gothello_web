@@ -45,11 +45,26 @@ body{
 #header #player_name{
     display: none;
     position: absolute;
+    justify-content: center;
+    align-items: center;
     margin: 0;
-    left: calc(2 * var(--vh, vh));
-    top: 47%;
-    font-size: calc(2.5 * var(--vh, vh));
+    padding: 0 calc(1 * var(--vh, vh));
+    height: calc(5.5 * var(--vh, vh));
+    left: calc(1 * var(--vh, vh));
+    border-radius: 1000px;
+    top: 50%;
+    font-size: calc(2.3 * var(--vh, vh));
     transform: translate(0, -50%);
+    font-weight: bolder;
+    box-sizing: border-box;
+}
+#header #player_name.black{
+    background-color: #767676;
+    color: #ffffff;
+}
+#header #player_name.white{
+    background-color: #ffffff;
+    color: #444444;
 }
 #header h1{
     display: block;

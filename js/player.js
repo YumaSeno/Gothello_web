@@ -39,11 +39,13 @@ export class DummyPlayer extends _UnplayblePlayer{
 }
 
 export class OnlinePlayer extends _UnplayblePlayer{
+    mode = null;
     code = null;
     isSettled = false;
 
-    constructor(name, code){
+    constructor(name, mode, code){
         super(name);
+        this.mode = mode;
         this.code = code;
     }
 
