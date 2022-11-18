@@ -19,6 +19,7 @@ export class Piece{
 export class Gothello{
     turn = 1;
     board = [];
+    onPlacesPiece =(x, y)=>[];
     onSettled = (player)=>{};
     _players = [];
     _turnPlayer = null;
@@ -53,6 +54,10 @@ export class Gothello{
         return playernum
     }
 
+    getTurnPlayer(){
+        return this._turnPlayer;
+    }
+
     isPlayerTurn(player){
         return this._turnPlayer == player;
     }
@@ -74,6 +79,7 @@ export class Gothello{
 
         if (state == playernum) this.board[x][y].setState(state + 2);
 
+        this.onPlacesPiece(x,y);
         this._players[opponentnum-1].placedPiece(x, y);
         this._turnPlayer = this._players[opponentnum-1];
         this.turn++;

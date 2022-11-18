@@ -28,6 +28,9 @@ class Game{
 
         this.operablePlayers = operablePlayers;
         this.gothello = this.gothelloInitialize(player1, player2);
+        this.gothello.onPlacesPiece = (x, y) => {
+            
+        }
         this.gothello.onSettled = player => {
             removeButtonConcedEvent()
             setTimeout(onSettled(player), 100);

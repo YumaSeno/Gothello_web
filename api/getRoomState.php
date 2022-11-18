@@ -42,12 +42,12 @@ function main(){
     if ($player_1_state["playerCode"] == $playerCode) $player_1_state["time"] = time();
     if ($player_2_state["playerCode"] == $playerCode) $player_2_state["time"] = time();
 
-    if($player_1_state["time"] >=0 && time() - $player_1_state["time"] > 60) {
+    if($player_1_state["time"] >=0 && time() - $player_1_state["time"] > 30) {
         removeRoom($path, $roomCode);
         echo '{"state" : "removed"}';
         exit;
     }
-    if($player_2_state["time"] >=0 && time() - $player_2_state["time"] > 60) {
+    if($player_2_state["time"] >=0 && time() - $player_2_state["time"] > 30) {
         removeRoom($path, $roomCode);
         echo '{"state" : "removed"}';
         exit;

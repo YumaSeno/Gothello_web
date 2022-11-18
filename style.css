@@ -42,6 +42,15 @@ body{
     box-shadow: #c1c1c1 calc(.4 * var(--vh, vh)) calc(.4 * var(--vh, vh)) calc(.4 * var(--vh, vh)) calc(.3 * var(--vh, vh)), 
                 #eeeeee calc(-.4 * var(--vh, vh)) calc(-.4 * var(--vh, vh)) calc(.4 * var(--vh, vh)) calc(.3 * var(--vh, vh));
 }
+#header #player_name{
+    display: block;
+    position: absolute;
+    margin: 0;
+    left: calc(2 * var(--vh, vh));
+    top: 45%;
+    font-size: calc(3 * var(--vh, vh));
+    transform: translate(0, -50%);
+}
 #header h1{
     display: block;
     position: absolute;

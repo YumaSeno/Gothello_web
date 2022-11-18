@@ -74,11 +74,11 @@ function main(){
         $player_1_state = json_decode(file_get_contents($path . (string)$room . "/player_1_state.json"), true);
         $player_2_state = json_decode(file_get_contents($path . (string)$room . "/player_2_state.json"), true);
 
-        if($player_1_state["time"] >=0 && time() - $player_1_state["time"] > 60) {
+        if($player_1_state["time"] >=0 && time() - $player_1_state["time"] > 30) {
             removeRoom($path, $room);
             continue;
         }
-        if($player_2_state["time"] >=0 && time() - $player_2_state["time"] > 60) {
+        if($player_2_state["time"] >=0 && time() - $player_2_state["time"] > 30) {
             removeRoom($path, $room);
             continue;
         }
