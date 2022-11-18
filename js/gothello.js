@@ -37,6 +37,13 @@ export class Gothello{
         }
     }
 
+    conced(player){
+        const opponentnum = this._getPlayerNum(player) == 1 ? 2 : 1;
+        this._players[opponentnum-1].onConceded();
+        this._turnPlayer = this._players[opponentnum-1];
+        this._settled();
+    }
+
     _getPlayerNum(player){
         let playernum = 0;
         for(const p of this._players) {

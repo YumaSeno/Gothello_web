@@ -34,14 +34,14 @@ body{
     display: block;
     position: absolute;
     font-weight: bolder;
-    font-size: calc(3 * var(--vh, vh));
+    font-size: calc(3.5 * var(--vh, vh));
     margin: 0;
     left: 50%;
     top: 50%;
     transform: translate(-50%,-50%);
 }
 #header #cancel_button{
-    display: block;
+    display: none;
     position: absolute;
     right: 5px;
     top: 50%;
@@ -71,8 +71,31 @@ body{
   transform: translate(-50%,-50%) rotate(-45deg);
 }
 
+#games{
+    position: relative;
+    display: block;
+    width: 600px;
+    height: calc(85 * var(--vh, vh));
+    max-width: calc(91 * var(--vw, vw));
+    left: 50%;
+    top: 45%;
+    transform: translate(-50%,-50%);
+    border-radius: 15px;
+    box-shadow: #c1c1c1 4px 4px 4px 3px, 
+                #eeeeee -4px -4px 4px 3px;
+}
+.game_selector{
+    height: 17%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: calc(3 * var(--vh, vh));
+    cursor: pointer;
+    border-bottom: solid 3px #bcbcbc;
+}
 
 #board{
+    display: none;
     position: absolute;
     width: calc(82 * var(--vh, vh));
     height: calc(82 * var(--vh, vh));
@@ -82,7 +105,6 @@ body{
     top: 55%;
     padding: calc(0.5 * var(--vh, vh));
     transform: translate(-50%,-50%);
-    display: flex;
     flex-flow: column;
     justify-content: space-around;
     box-sizing: border-box;
@@ -103,7 +125,6 @@ body{
     width: 10%;
     padding-top: 10%;
     cursor: pointer;
-    /*border: solid 1px #ababab;*/
 }
 .black{
     background: #767676;
@@ -141,8 +162,6 @@ body{
     height: 100%;
     width: calc(.15 * var(--vh, vh));
     background: #cbcbcb;
-    /*box-shadow: #b5b5b5 -1px -1px 2px 1px,
-                #fdfdfd 1px 1px 2px 1px;*/
 }
 .row_separator .separator{
     width: 10%;
