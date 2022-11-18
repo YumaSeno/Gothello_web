@@ -3,8 +3,6 @@ import { Gothello } from "./gothello.js";
 import { Player, DummyPlayer } from "./player.js";
 import { DrawablePiece } from "./drawablePiece.js";
 
-
-
 class Game{
     operablePlayers = [null];
     gothello = null;
@@ -17,9 +15,9 @@ class Game{
             let currentPlayer = null;
             for (const player of this.operablePlayers) {if (this.gothello.isPlayerTurn(player)) currentPlayer = player;}
             if (currentPlayer) currentPlayer.conced();
-            document.getElementById("cancel_button").removeEventListener("click", conced)
+            document.getElementById("cancel_button").removeEventListener("click", conced);
         }
-        document.getElementById("cancel_button").addEventListener("click", conced)
+        document.getElementById("cancel_button").addEventListener("click", conced);
     }
     
     selectLocalGame(){
@@ -29,34 +27,31 @@ class Game{
         this.gothello = this.gothelloInitialize(player1, player2);
         this.gothello.onSettled = player => {
             setTimeout(()=>{
-                alert(`${player.name} Win!`);
-                this.onSettled();
+                this.onSettled(`${player.name} Win!`);
             }, 200);
         }
     }
     
     selectDummyGame(){
         let player1 = new Player("You");
-        let player2 = new DummyPlayer("monkey");
+        let player2 = new DummyPlayer("Monkey");
         this.operablePlayers = [player1];
         this.gothello = this.gothelloInitialize(player1, player2);
         this.gothello.onSettled = player => {
             setTimeout(()=>{
-                alert(`${player.name} Win!`);
-                this.onSettled();
+                this.onSettled(`You ${player.name == "You" ? "Win!" : "Lose..."}`);
             }, 200);
         }
     }
     
     selectOnlineGame(code){
         let player1 = new Player("You");
-        let player2 = new DummyPlayer("monkey");
+        let player2 = new DummyPlayer("Opponent");
         this.operablePlayers = [player1];
         this.gothello = this.gothelloInitialize(player1, player2);
         this.gothello.onSettled = player => {
             setTimeout(()=>{
-                alert(`${player.name} Win!`);
-                this.onSettled();
+                this.onSettled(`You ${player.name == "You" ? "Win!" : "Lose..."}`);
             }, 200);
         }
     }
@@ -107,10 +102,6 @@ class Game{
     }
 }
 
-for (const element of document.getElementsByClassName("game_selector")) {
-    element.addEventListener("click", ()=>selectGame(element));
-}
-
 function selectGame(element){
     console.log(element.className)
 
@@ -121,16 +112,37 @@ function selectGame(element){
         document.getElementById("board").style.display = "none";
         document.getElementById("cancel_button").style.display = "none";
         document.getElementById("games").style.display = "block";
+        document.getElementById("message").style.display = "none";
+        document.getElementById("cancel_button").removeEventListener("click", undoElement)
+        
+        location.reload();
+    }
+
+    const onSettled = (message)=> {
+        document.getElementById("message").innerText = message;
+        document.getElementById("message").style.display = "flex";
+        document.getElementById("cancel_button").addEventListener("click", undoElement);
     }
 
     if(element.className.includes("offline_mode")){
         const game = new Game();
         game.selectLocalGame();
-        game.onSettled = undoElement;
+        game.onSettled = onSettled;
     }
+
     if(element.className.includes("monkey_mode")){
         const game = new Game();
         game.selectDummyGame();
-        game.onSettled = undoElement;
+        game.onSettled = onSettled;
     }
+    
+    if(element.className.includes("online_mode")){
+        const game = new Game();
+        game.selectonlineGame();
+        game.onSettled = onSettled;
+    }
+}
+
+for (const element of document.getElementsByClassName("game_selector")) {
+    element.addEventListener("click", ()=>selectGame(element));
 }

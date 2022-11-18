@@ -71,6 +71,22 @@ body{
   transform: translate(-50%,-50%) rotate(-45deg);
 }
 
+#message{
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: calc(15 * var(--vh, vh));
+    background-color: #f26b6b53;
+    z-index: 1;
+    top: 50%;
+    transform: translate(0, -50%);
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+    font-weight: bolder;
+    font-size: calc(4.3 * var(--vh, vh));
+}
+
 #games{
     position: relative;
     display: block;

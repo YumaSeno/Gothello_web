@@ -3,8 +3,9 @@
 class _UnplayblePlayer{
     name = "";
     gothello = null;
-    switchTurn(x, y){}
-    onConceded(){}
+    placedPiece(x, y){}
+    conceded(){}
+    settled(player){}
 
     constructor(name){
         this.name = name;
@@ -34,8 +35,30 @@ export class DummyPlayer extends _UnplayblePlayer{
     _conced(){
         if (this.gothello.isPlayerTurn(this)) this.gothello.conced(this);
     }
+}
+
+export class onlinePlayer extends _UnplayblePlayer{
+    code = null;
+    isSettled = false;
+
+    constructor(name, code){
+        super(name);
+        this.code = code;
+    }
+
+    _placePiece(x, y){
+        if (this.gothello.isPlayerTurn(this)) this.gothello.placePiece(this, x, y);
+    }
     
-    switchTurn(x, y){
+    _conced(){
+        if (this.gothello.isPlayerTurn(this)) this.gothello.conced(this);
+    }
+    
+    settled(player){
+        isSettled = true;
+    }
+    
+    placedPiece(x, y){
         if(this.gothello.isPlayerTurn(this)){
             
         }
