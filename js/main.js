@@ -25,11 +25,13 @@ class Game{
         }
         const removeButtonConcedEvent = ()=>document.getElementById("cancel_button").removeEventListener("click", _conced);
         document.getElementById("cancel_button").addEventListener("click", _conced);
+        
+        document.getElementById("player_name").innerText = "turn : "+player1.name;
 
         this.operablePlayers = operablePlayers;
         this.gothello = this.gothelloInitialize(player1, player2);
         this.gothello.onPlacesPiece = (x, y) => {
-            
+            document.getElementById("player_name").innerText = "turn : "+this.gothello.getTurnPlayer().name;
         }
         this.gothello.onSettled = player => {
             removeButtonConcedEvent()
@@ -88,8 +90,10 @@ const OPERATION_ELEMENT = {
         document.getElementById("games_outer").style.display = "none";
         document.getElementById("cancel_button").style.display = "block";
         document.getElementById("board").style.display = "flex";
+        document.getElementById("player_name").style.display = "block";
     }, 
     undoElement(){
+        document.getElementById("player_name").style.display = "none";
         document.getElementById("board").style.display = "none";
         document.getElementById("cancel_button").style.display = "none";
         document.getElementById("games_outer").style.display = "block";

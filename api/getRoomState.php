@@ -31,16 +31,28 @@ function main(){
     $roomCode = $_POST["roomCode"];
     $playerCode = $_POST["playerCode"];
     if(!isset($roomCode) || !isset($playerCode)){
-        echo "error - パラメタが足りません。";
+        echo "error - パラメ-ータが足りません。";
         exit;
     }
 
     $path = "../games/free/";
+    
+    if(!file_exists($path . (string)$roomCode)){
+        echo '{"state" : "removed"}';
+        exit;
+    }
+
     $player_1_state = json_decode(file_get_contents($path . (string)$roomCode . "/player_1_state.json"), true);
     $player_2_state = json_decode(file_get_contents($path . (string)$roomCode . "/player_2_state.json"), true);
 
-    if ($player_1_state["playerCode"] == $playerCode) $player_1_state["time"] = time();
-    if ($player_2_state["playerCode"] == $playerCode) $player_2_state["time"] = time();
+    if ($player_1_state["playerCode"] == $playerCode) {
+        $player_1_state["time"] = time();
+        file_put_contents($path . (string)$roomCode . "/player_1_state.json", json_encode($player_1_state));
+    }
+    if ($player_2_state["playerCode"] == $playerCode) {
+        $player_2_state["time"] = time();
+        file_put_contents($path . (string)$roomCode . "/player_2_state.json", json_encode($player_2_state));
+    }
 
     if($player_1_state["time"] >=0 && time() - $player_1_state["time"] > 30) {
         removeRoom($path, $roomCode);
