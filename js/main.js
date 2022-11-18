@@ -1,61 +1,39 @@
 'use strict';
 import { Gothello } from "./gothello.js";
-import { Player, DummyPlayer } from "./player.js";
+import { Player, DummyPlayer, OnlinePlayer } from "./player.js";
 import { DrawablePiece } from "./drawablePiece.js";
+import { API } from "./apiCall.js"
 
 class Game{
     operablePlayers = [null];
     gothello = null;
-    onSettled=()=>{};
     
-    constructor(){
-        const conced = () => {
-            if (! window.confirm("投了しますか？"))return;
-
+    constructor(player1, player2, operablePlayers, onSettled){
+        const _conced = ()=>{
             let currentPlayer = null;
             for (const player of this.operablePlayers) {if (this.gothello.isPlayerTurn(player)) currentPlayer = player;}
+
+            if (!currentPlayer){
+                alert("自分のターンにしか投了はできません");
+                return;
+            }
+
+            if (! window.confirm("投了しますか？"))return;
+    
             if (currentPlayer) currentPlayer.conced();
-            document.getElementById("cancel_button").removeEventListener("click", conced);
+            removeButtonConcedEvent();
         }
-        document.getElementById("cancel_button").addEventListener("click", conced);
-    }
-    
-    selectLocalGame(){
-        let player1 = new Player("player1");
-        let player2 = new Player("player2");
-        this.operablePlayers = [player1, player2];
+        const removeButtonConcedEvent = ()=>document.getElementById("cancel_button").removeEventListener("click", _conced);
+        document.getElementById("cancel_button").addEventListener("click", _conced);
+
+        this.operablePlayers = operablePlayers;
         this.gothello = this.gothelloInitialize(player1, player2);
         this.gothello.onSettled = player => {
-            setTimeout(()=>{
-                this.onSettled(`${player.name} Win!`);
-            }, 200);
+            removeButtonConcedEvent()
+            setTimeout(onSettled(player), 100);
         }
     }
-    
-    selectDummyGame(){
-        let player1 = new Player("You");
-        let player2 = new DummyPlayer("Monkey");
-        this.operablePlayers = [player1];
-        this.gothello = this.gothelloInitialize(player1, player2);
-        this.gothello.onSettled = player => {
-            setTimeout(()=>{
-                this.onSettled(`You ${player.name == "You" ? "Win!" : "Lose..."}`);
-            }, 200);
-        }
-    }
-    
-    selectOnlineGame(code){
-        let player1 = new Player("You");
-        let player2 = new DummyPlayer("Opponent");
-        this.operablePlayers = [player1];
-        this.gothello = this.gothelloInitialize(player1, player2);
-        this.gothello.onSettled = player => {
-            setTimeout(()=>{
-                this.onSettled(`You ${player.name == "You" ? "Win!" : "Lose..."}`);
-            }, 200);
-        }
-    }
-    
+
     gothelloInitialize(player1, player2){
         const board = [];
         const boardElement = document.getElementById("board");
@@ -102,44 +80,130 @@ class Game{
     }
 }
 
-function selectGame(element){
-    console.log(element.className)
-
-    document.getElementById("games").style.display = "none";
-    document.getElementById("cancel_button").style.display = "block";
-    document.getElementById("board").style.display = "flex";
-    const undoElement = ()=> {
+const OPERATION_ELEMENT = {
+    readyElement(){
+        document.getElementById("games_outer").style.display = "none";
+        document.getElementById("cancel_button").style.display = "block";
+        document.getElementById("board").style.display = "flex";
+    }, 
+    undoElement(){
         document.getElementById("board").style.display = "none";
         document.getElementById("cancel_button").style.display = "none";
-        document.getElementById("games").style.display = "block";
+        document.getElementById("games_outer").style.display = "block";
+        document.getElementById("message").innerText = "";
         document.getElementById("message").style.display = "none";
-        document.getElementById("cancel_button").removeEventListener("click", undoElement)
+        document.getElementById("cancel_button").removeEventListener("click", this.undoElement)
         
         location.reload();
-    }
-
-    const onSettled = (message)=> {
+    }, 
+    onSettled(message){
         document.getElementById("message").innerText = message;
         document.getElementById("message").style.display = "flex";
-        document.getElementById("cancel_button").addEventListener("click", undoElement);
+        document.getElementById("cancel_button").addEventListener("click", this.undoElement);
+    },
+}
+
+class OfflineRoom{
+    start(){
+        OPERATION_ELEMENT.readyElement();
+        const player1 = new Player("player1");
+        const player2 = new Player("player2");
+        const game = new Game(
+            player1, 
+            player2, 
+            [player1, player2], 
+            (winner) => OPERATION_ELEMENT.onSettled(`${winner.name} Win!`)
+        );
+    }
+}
+
+class MonkeyRoom{
+    start(){
+        OPERATION_ELEMENT.readyElement();
+        const player1 = new Player("You");
+        const player2 = new DummyPlayer("Monkey");
+        const game = new Game(
+            player1,
+            player2,
+            [player1],
+            (winner) => OPERATION_ELEMENT.onSettled(`You ${winner.name == "You" ? "Win!" : "Lose..."}`)
+        );
+    }
+}
+
+class OnlineRoom{
+    roomCode = null;
+    playerNum = null;
+    playerCode = null;
+    state = "waiting";
+
+    constructor(){
+        document.getElementById("games_outer").style.display = "none";
+        document.getElementById("message").innerText = "対戦相手を待っています";
+        document.getElementById("message").style.display = "flex";
+        API.call("getFreeRoomCode", {}, (response)=>{
+            this.roomCode = response.room;
+            this.playerNum = response.playerNum;
+            this.playerCode = response.playerCode;
+            this.checkRoomState()
+        });
     }
 
+    checkRoomState(){
+        API.call("getRoomState", {roomCode: this.roomCode, playerCode: this.playerCode}, (response)=>{
+            if (this.state == "settled")return;
+
+            if (response.state == "removed"){
+                alert("接続が切れました。");
+                location.reload();
+            }
+            if(this.state == "waiting" && response.state == "playing"){
+                document.getElementById("message").style.display = "none";
+                this.start();
+            }
+            this.state = response.state;
+
+            document.getElementById("message").innerText = document.getElementById("message").innerText + ".";
+
+            if (document.getElementById("message").innerText == "対戦相手を待っています....")
+                document.getElementById("message").innerText = "対戦相手を待っています";
+
+            setTimeout(()=>{
+                this.checkRoomState();
+            }, 500);
+        });
+    }
+    
+    start(){
+        OPERATION_ELEMENT.readyElement();
+        const players = [new Player("あなた"), new OnlinePlayer("相手", this.roomCode, this.playerCode)]
+        const player1 = players[this.playerNum - 1];
+        const player2 = players[this.playerNum % 2];
+        const game = new Game(
+            player1, 
+            player2, 
+            [players[0]], 
+            (winner) => {
+                this.state = "settled";
+                OPERATION_ELEMENT.onSettled(`You ${winner.name == "あなた" ? "Win!" : "Lose..."}`);
+            }
+        );
+    }
+}
+
+function selectGame(element){
     if(element.className.includes("offline_mode")){
-        const game = new Game();
-        game.selectLocalGame();
-        game.onSettled = onSettled;
+        const room = new OfflineRoom();
+        room.start();
     }
 
     if(element.className.includes("monkey_mode")){
-        const game = new Game();
-        game.selectDummyGame();
-        game.onSettled = onSettled;
+        const room = new MonkeyRoom();
+        room.start();
     }
     
-    if(element.className.includes("online_mode")){
-        const game = new Game();
-        game.selectonlineGame();
-        game.onSettled = onSettled;
+    if(element.className.includes("free_online_mode")){
+        const room = new OnlineRoom();
     }
 }
 

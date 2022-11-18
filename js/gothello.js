@@ -74,7 +74,7 @@ export class Gothello{
 
         if (state == playernum) this.board[x][y].setState(state + 2);
 
-        this._players[opponentnum-1].switchTurn(x, y);
+        this._players[opponentnum-1].placedPiece(x, y);
         this._turnPlayer = this._players[opponentnum-1];
         this.turn++;
     }

@@ -17,14 +17,23 @@
 <body>
     <div id="header">
         <h1>Gothello</h1>
-        <div id="cancel_button"></div>
+        <div type="button" id="cancel_button"></div>
     </div>
+    
     <p id="message"></p>
-    <div id="games">
-        <div class="game_selector offline_mode">オフライン対戦</div>
-        <div class="game_selector monkey_mode">サルと対戦</div>
+
+    <div id="games_outer">
+        <div id="games">
+            <div class="game_selector offline_mode">オフライン対戦</div>
+            <div class="game_selector monkey_mode">サルと対戦</div>
+            <div class="game_selector free_online_mode">フリーマッチ</div>
+            <!--div class="game_selector private_start">プライベートルームを作成</div>
+            <div class="game_selector private_join">プライベートルームに参加</div-->
+        </div>
     </div>
+
     <div id="board"></div>
+    
     <script>
         (()=>{
             let height = document.documentElement.clientHeight;

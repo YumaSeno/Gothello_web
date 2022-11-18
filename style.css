@@ -3,6 +3,18 @@
     --vh: 1vh;
     --vmin: 1vh;
 }
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+ 
+::-webkit-scrollbar-thumb {
+    background: #a9a9a9;
+    border-radius: 5px;
+}
+::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
 
 body{
     margin: 0;
@@ -27,8 +39,8 @@ body{
     margin-top: 1.5%;
     transform: translate(-50%,0);
     border-radius: 1000px;
-    box-shadow: #c1c1c1 4px 4px 4px 3px, 
-                #eeeeee -4px -4px 4px 3px;
+    box-shadow: #c1c1c1 calc(.4 * var(--vh, vh)) calc(.4 * var(--vh, vh)) calc(.4 * var(--vh, vh)) calc(.3 * var(--vh, vh)), 
+                #eeeeee calc(-.4 * var(--vh, vh)) calc(-.4 * var(--vh, vh)) calc(.4 * var(--vh, vh)) calc(.3 * var(--vh, vh));
 }
 #header h1{
     display: block;
@@ -43,16 +55,16 @@ body{
 #header #cancel_button{
     display: none;
     position: absolute;
-    right: 5px;
+    right: calc(.5 * var(--vh, vh));
     top: 50%;
-    height: 90%;
+    height: calc(100% - (1 * var(--vh, vh)));
     transform: translate(0, -50%);
     aspect-ratio: 1;
     cursor: pointer;
     border-radius: 1000px;
     background: #eabbbb;
-    box-shadow: #c1c1c1 2px 2px 2px 1px, 
-                #eeeeee -2px -2px 2px 1px;
+    box-shadow: #c1c1c1 calc(.2 * var(--vh, vh)) calc(.2 * var(--vh, vh)) calc(.2 * var(--vh, vh)) calc(.1 * var(--vh, vh)), 
+                #eeeeee calc(-.2 * var(--vh, vh)) calc(-.2 * var(--vh, vh)) calc(.2 * var(--vh, vh)) calc(.1 * var(--vh, vh));
 }
 #cancel_button::before, #cancel_button::after {
   content: "";
@@ -87,27 +99,46 @@ body{
     font-size: calc(4.3 * var(--vh, vh));
 }
 
-#games{
+#games_outer{
     position: relative;
     display: block;
     width: 600px;
     height: calc(85 * var(--vh, vh));
     max-width: calc(91 * var(--vw, vw));
     left: 50%;
-    top: 45%;
-    transform: translate(-50%,-50%);
+    top: 46%;
     border-radius: 15px;
-    box-shadow: #c1c1c1 4px 4px 4px 3px, 
-                #eeeeee -4px -4px 4px 3px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    transform: translate(-50%,-50%);
+    box-shadow: #c1c1c1 calc(.4 * var(--vh, vh)) calc(.4 * var(--vh, vh)) calc(.4 * var(--vh, vh)) calc(.3 * var(--vh, vh)), 
+                #eeeeee calc(-.4 * var(--vh, vh)) calc(-.4 * var(--vh, vh)) calc(.4 * var(--vh, vh)) calc(.3 * var(--vh, vh));
+}
+#games{
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 .game_selector{
-    height: 17%;
+    height: 15%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: calc(3 * var(--vh, vh));
+    font-size: calc(2.7 * var(--vh, vh));
     cursor: pointer;
     border-bottom: solid 3px #bcbcbc;
+}
+.game_selector.offline_mode{
+    background-color: #bbbbbb;
+}
+.game_selector.monkey_mode{
+    background-color: #d2d1d1;
+}
+.game_selector.free_online_mode{
+    background-color: #e6e6e6;
 }
 
 #board{
@@ -125,8 +156,8 @@ body{
     justify-content: space-around;
     box-sizing: border-box;
     border-radius: 15px;
-    box-shadow: #c1c1c1 4px 4px 4px 3px, 
-                #eeeeee -4px -4px 4px 3px;
+    box-shadow: #c1c1c1 calc(.4 * var(--vh, vh)) calc(.4 * var(--vh, vh)) calc(.4 * var(--vh, vh)) calc(.3 * var(--vh, vh)), 
+                #eeeeee calc(-.4 * var(--vh, vh)) calc(-.4 * var(--vh, vh)) calc(.4 * var(--vh, vh)) calc(.3 * var(--vh, vh));
 }
 .row{
     width: 100%;
@@ -137,7 +168,7 @@ body{
     position: relative;
     display: block;
     background: #dedede;
-    border-radius: 10000px;
+    border-radius: 1000px;
     width: 10%;
     padding-top: 10%;
     cursor: pointer;

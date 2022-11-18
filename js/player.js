@@ -1,4 +1,5 @@
 'use strict';
+import { API } from "./apiCall.js"
 
 class _UnplayblePlayer{
     name = "";
@@ -37,7 +38,7 @@ export class DummyPlayer extends _UnplayblePlayer{
     }
 }
 
-export class onlinePlayer extends _UnplayblePlayer{
+export class OnlinePlayer extends _UnplayblePlayer{
     code = null;
     isSettled = false;
 
