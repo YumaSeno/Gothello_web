@@ -1,100 +1,10 @@
 'use strict';
-import { Gothello } from "./gothello.js";
+import { Game } from "./game.js";
 import { Player, DummyPlayer, OnlinePlayer } from "./player.js";
-import { DrawablePiece } from "./drawablePiece.js";
 import { API } from "./apiCall.js"
 
-class Game{
-    operablePlayers = [null];
-    gothello = null;
-    
-    constructor(player1, player2, operablePlayers, onSettled){
-        const _conced = ()=>{
-            let currentPlayer = null;
-            for (const player of this.operablePlayers) {if (this.gothello.isPlayerTurn(player)) currentPlayer = player;}
-
-            if (!currentPlayer){
-                alert("自分のターンにしか投了はできません");
-                return;
-            }
-
-            if (! window.confirm("投了しますか？"))return;
-    
-            if (currentPlayer) currentPlayer.conced();
-            removeButtonConcedEvent();
-        }
-        const removeButtonConcedEvent = ()=>document.getElementById("cancel_button").removeEventListener("click", _conced);
-        document.getElementById("cancel_button").addEventListener("click", _conced);
-        
-        document.getElementById("player_name").innerText = player1.name;
-        document.getElementById("player_name").className = "black";
-
-        let isSettled = false;
-
-        this.operablePlayers = operablePlayers;
-        this.gothello = this.gothelloInitialize(player1, player2);
-        this.gothello.onPlacesPiece = (x, y) => {
-            if(!isSettled)document.getElementById("player_name").innerText = this.gothello.getTurnPlayer().name;
-            if(this.gothello.getTurnPlayer() == player1){
-                document.getElementById("player_name").className = "black";
-            }else{
-                document.getElementById("player_name").className = "white";
-            }
-        }
-        this.gothello.onSettled = player => {
-            removeButtonConcedEvent()
-            isSettled = true;
-            setTimeout(()=>{
-                onSettled(player);
-            }, 100);
-        }
-    }
-
-    gothelloInitialize(player1, player2){
-        const board = [];
-        const boardElement = document.getElementById("board");
-        while (boardElement.firstChild) boardElement.removeChild(boardElement.firstChild);
-        for(let y = 0; y < 9; y++){
-            const rowElement = document.createElement("div");
-            rowElement.className = "row";
-            const rowSeparatorElement = document.createElement("div");
-            rowSeparatorElement.className = "row_separator";
-            const row = [];
-            for(let x = 0; x < 9; x++){
-                let separatorElement = document.createElement("div");
-                separatorElement.className = "separator";
-    
-                const pieceElement = document.createElement("div");
-                pieceElement.className = "piece";
-                pieceElement.dataset.x = x;
-                pieceElement.dataset.y = y;
-                pieceElement.addEventListener("click", ()=>this.onPieceClicked(pieceElement));
-                rowElement.appendChild(pieceElement);
-                if (x < 8) rowElement.appendChild(separatorElement);
-    
-                row.push(new DrawablePiece(x, y, pieceElement));
-    
-                separatorElement = document.createElement("div");
-                separatorElement.className = "separator";
-                rowSeparatorElement.appendChild(separatorElement);
-                if (x < 8) rowSeparatorElement.appendChild(document.createElement("div"));
-            }
-            boardElement.appendChild(rowElement);
-            if (y < 8) {
-                boardElement.appendChild(rowSeparatorElement);
-            }
-            board.push(row);
-        }
-    
-        return new Gothello(player1, player2, (x,y) => board[x][y]);
-    }
-    
-    onPieceClicked(e){
-        let currentPlayer = null;
-        for (const player of this.operablePlayers) {if (this.gothello.isPlayerTurn(player)) currentPlayer = player;}
-        if (currentPlayer) currentPlayer.placePiece(Number(e.dataset.x), Number(e.dataset.y));
-    }
-}
+//サーバー側に残っているルームを削除
+API.call("checkDisconnectedRoom");
 
 const OPERATION_ELEMENT = {
     readyElement(){
@@ -160,6 +70,7 @@ class OnlineRoom{
         document.getElementById("message").innerText = "対戦相手を待っています";
         document.getElementById("message").style.display = "flex";
         API.call("getFreeRoomCode", {}, (response)=>{
+            console.log(response)
             this.roomCode = response.room;
             this.playerNum = response.playerNum;
             this.playerCode = response.playerCode;
@@ -194,16 +105,16 @@ class OnlineRoom{
     
     start(){
         OPERATION_ELEMENT.readyElement();
-        const players = [new Player("あなた"), new OnlinePlayer("相手", this.roomCode, this.playerCode)]
+        const players = [new Player("あなた"), new OnlinePlayer("相手", "free", this.roomCode, this.playerCode)]
         const player1 = players[this.playerNum - 1];
         const player2 = players[this.playerNum % 2];
         const game = new Game(
             player1, 
             player2, 
             [players[0]], 
-            (winner) => {
+            (winner, message) => {
                 this.state = "settled";
-                OPERATION_ELEMENT.onSettled(`You ${winner.name == "あなた" ? "Win!" : "Lose..."}`);
+                OPERATION_ELEMENT.onSettled(`You ${winner.name == "あなた" ? `Win! ${message}` : "Lose..."}`);
             }
         );
     }

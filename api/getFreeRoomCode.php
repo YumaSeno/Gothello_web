@@ -28,7 +28,7 @@ function createRoom($path){
     mkdir($path. (string)$room);
     file_put_contents($path . (string)$room . "/player_1_state.json", json_encode(["time" => $times[0], "playerCode" => $playerCodes[0]]));
     file_put_contents($path . (string)$room . "/player_2_state.json", json_encode(["time" => $times[1], "playerCode" => $playerCodes[1]]));
-    file_put_contents($path . (string)$room . "/latestMove.json", "{}");
+    file_put_contents($path . (string)$room . "/latestMove.json", json_encode(["moveType" => "create", "playerCode" => 0]));
     return [$room, $playerNum, $playerCode];
 }
 

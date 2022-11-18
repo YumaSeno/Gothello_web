@@ -2,7 +2,7 @@
 
 export const API = {
 
-    call(apiName, data, callback){
+    call(apiName, data = {}, callback = (response)=>{}){
         const _xhr = new XMLHttpRequest();
 
         _xhr.onreadystatechange = function()
@@ -10,8 +10,17 @@ export const API = {
             const READYSTATE_COMPLETED = 4;
             const HTTP_STATUS_OK = 200;
             if( this.readyState == READYSTATE_COMPLETED && this.status == HTTP_STATUS_OK ){
-                console.log(this.responseText);
-                callback(JSON.parse(this.responseText));
+                let responseText = this.responseText;
+                if(responseText == "")responseText = "{}"
+
+                let responseObject = {};
+                try {
+                    responseObject = JSON.parse(responseText);
+                } catch (error) {
+                    console.log(responseText);
+                    return;
+                }
+                callback(responseObject);
             }
         };
         _xhr.open("post", `./api/${apiName}.php`);

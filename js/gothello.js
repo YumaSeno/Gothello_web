@@ -20,7 +20,7 @@ export class Gothello{
     turn = 1;
     board = [];
     onPlacesPiece =(x, y)=>[];
-    onSettled = (player)=>{};
+    onSettled = (player, message)=>{};
     _players = [];
     _turnPlayer = null;
     
@@ -42,7 +42,7 @@ export class Gothello{
         const opponentnum = this._getPlayerNum(player) == 1 ? 2 : 1;
         this._players[opponentnum-1].conceded();
         this._turnPlayer = this._players[opponentnum-1];
-        this._settled();
+        this._settled("投了されました。");
     }
 
     _getPlayerNum(player){
@@ -75,11 +75,12 @@ export class Gothello{
         if (state >= 3) return;
         if (state == opponentnum) return;
         
+        this._players[opponentnum-1].placedPiece(x, y);
+        
+        if (state == playernum) this.board[x][y].setState(state + 2);
+        
         if (state == 0) if (!this._placeNewPiece(playernum,x,y)) return;
 
-        if (state == playernum) this.board[x][y].setState(state + 2);
-
-        this._players[opponentnum-1].placedPiece(x, y);
         this._turnPlayer = this._players[opponentnum-1];
         this.onPlacesPiece(x,y);
         this.turn++;
@@ -106,7 +107,7 @@ export class Gothello{
         this._reflectBoardInt(board);
 
         if(victory){
-            this._settled();
+            this._settled("");
             return false;
         }
 
@@ -196,8 +197,8 @@ export class Gothello{
         }
     }
 
-    _settled(){
-        this.onSettled(this._turnPlayer);
+    _settled(message){
+        this.onSettled(this._turnPlayer, message);
         for (const player of this._players) {player.settled(this._turnPlayer);}
         this._turnPlayer = null;
     }

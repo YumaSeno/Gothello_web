@@ -40,14 +40,31 @@ export class DummyPlayer extends _UnplayblePlayer{
 
 export class OnlinePlayer extends _UnplayblePlayer{
     mode = null;
-    code = null;
+    roomCode = null;
+    playerCode = null;
     isSettled = false;
 
-    constructor(name, mode, code){
+    constructor(name, mode, roomCode, playerCode){
         super(name);
         this.mode = mode;
-        this.code = code;
+        this.roomCode = roomCode;
+        this.playerCode = playerCode;
+
+        const _checkOpponentMove = ()=>{
+            API.call("getLatestMove", {
+                mode: this.mode,
+                roomCode: this.roomCode,
+                playerCode: this.playerCode
+            },(response)=>{
+                console.log(response);
+                if(response.moveType == "placePiece") this._placePiece(response.x, response.y);
+                if(response.moveType == "conced") this._conced();
+                if(!this.isSettled)setTimeout(_checkOpponentMove, 500);
+            });
+        }
+        _checkOpponentMove();
     }
+
 
     _placePiece(x, y){
         if (this.gothello.isPlayerTurn(this)) this.gothello.placePiece(this, x, y);
@@ -58,12 +75,26 @@ export class OnlinePlayer extends _UnplayblePlayer{
     }
     
     settled(player){
-        isSettled = true;
+        this.isSettled = true;
+    }
+    
+    conceded(){
+        API.call("setLatestMove", {
+            mode: this.mode,
+            roomCode: this.roomCode,
+            playerCode: this.playerCode,
+            moveType: "conced",
+        });
     }
     
     placedPiece(x, y){
-        if(this.gothello.isPlayerTurn(this)){
-            
-        }
+        API.call("setLatestMove", {
+            mode: this.mode,
+            roomCode: this.roomCode,
+            playerCode: this.playerCode,
+            moveType: "placePiece",
+            x: x,
+            y: y
+        });
     }
 }

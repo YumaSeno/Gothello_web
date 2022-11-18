@@ -36,7 +36,7 @@ body{
     max-width: calc(95 * var(--vw, vw));
     height: calc(6.5 * var(--vh, vh));
     left: 50%;
-    margin-top: 1.5%;
+    margin-top: calc(2.5 * var(--vh, vh));
     transform: translate(-50%,0);
     border-radius: 1000px;
     box-shadow: #c1c1c1 calc(.4 * var(--vh, vh)) calc(.4 * var(--vh, vh)) calc(.4 * var(--vh, vh)) calc(.3 * var(--vh, vh)), 
@@ -112,7 +112,7 @@ body{
     position: absolute;
     width: 100%;
     height: calc(15 * var(--vh, vh));
-    background-color: #f26b6b53;
+    background-color: #f26b6b6f;
     z-index: 1;
     top: 50%;
     transform: translate(0, -50%);
@@ -130,11 +130,11 @@ body{
     height: calc(85 * var(--vh, vh));
     max-width: calc(91 * var(--vw, vw));
     left: 50%;
-    top: 46%;
+    margin-top: calc(3 * var(--vh, vh));
     border-radius: 15px;
     overflow-x: hidden;
     overflow-y: hidden;
-    transform: translate(-50%,-50%);
+    transform: translate(-50%, 0);
     box-shadow: #c1c1c1 calc(.4 * var(--vh, vh)) calc(.4 * var(--vh, vh)) calc(.4 * var(--vh, vh)) calc(.3 * var(--vh, vh)), 
                 #eeeeee calc(-.4 * var(--vh, vh)) calc(-.4 * var(--vh, vh)) calc(.4 * var(--vh, vh)) calc(.3 * var(--vh, vh));
 }
