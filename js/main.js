@@ -70,7 +70,6 @@ class OnlineRoom{
         document.getElementById("message").innerText = "対戦相手を待っています";
         document.getElementById("message").style.display = "flex";
         API.call("getFreeRoomCode", {}, (response)=>{
-            console.log(response)
             this.roomCode = response.room;
             this.playerNum = response.playerNum;
             this.playerCode = response.playerCode;
@@ -99,7 +98,7 @@ class OnlineRoom{
 
             setTimeout(()=>{
                 this.checkRoomState();
-            }, 500);
+            }, 2000);
         });
     }
     

@@ -25,7 +25,16 @@ export const API = {
         };
         _xhr.open("post", `./api/${apiName}.php`);
         _xhr.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded');
-        _xhr.send(this._encodeHTMLForm(data));
+        
+        const trySend = ()=>{
+            try {
+                _xhr.send(this._encodeHTMLForm(data));
+            } catch (error) {
+                console.log(error);
+                setTimeout(()=>trySend(), 1000);
+            }
+        }
+        trySend();
     },
     
     _encodeHTMLForm( data ){

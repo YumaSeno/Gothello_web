@@ -56,10 +56,9 @@ export class OnlinePlayer extends _UnplayblePlayer{
                 roomCode: this.roomCode,
                 playerCode: this.playerCode
             },(response)=>{
-                console.log(response);
                 if(response.moveType == "placePiece") this._placePiece(response.x, response.y);
                 if(response.moveType == "conced") this._conced();
-                if(!this.isSettled)setTimeout(_checkOpponentMove, 500);
+                if(!this.isSettled)setTimeout(_checkOpponentMove, 1500);
             });
         }
         _checkOpponentMove();
