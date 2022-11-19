@@ -64,8 +64,22 @@ class OnlineRoom{
     playerNum = null;
     playerCode = null;
     state = "waiting";
+    interruption = null;
 
     constructor(){
+        const interruption = ()=>{
+            this.state = "settled";
+            API.call("interruptionWaitingRoom", {roomCode: this.roomCode, playerCode: this.playerCode, mode: "free"}, (response)=>{
+                document.getElementById("games_outer").style.display = "block";
+                document.getElementById("message").innerText = "";
+                document.getElementById("message").style.display = "none";
+            });
+            document.getElementById("cancel_button").style.display = "none";
+            document.getElementById("cancel_button").removeEventListener("click", interruption);
+        }
+        this.interruption = interruption;
+        document.getElementById("cancel_button").addEventListener("click", interruption);
+        document.getElementById("cancel_button").style.display = "block";
         document.getElementById("games_outer").style.display = "none";
         document.getElementById("message").innerText = "対戦相手を待っています";
         document.getElementById("message").style.display = "flex";
@@ -103,6 +117,7 @@ class OnlineRoom{
     }
     
     start(){
+        document.getElementById("cancel_button").removeEventListener("click", this.interruption);
         OPERATION_ELEMENT.readyElement();
         const players = [new Player("あなた"), new OnlinePlayer("相手", "free", this.roomCode, this.playerCode)]
         const player1 = players[this.playerNum - 1];
