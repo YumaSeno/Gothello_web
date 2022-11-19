@@ -64,21 +64,21 @@ class OnlineRoom{
     playerNum = null;
     playerCode = null;
     state = "waiting";
-    interruption = null;
+    stopMatching = null;
 
     constructor(){
-        const interruption = ()=>{
+        const stopMatching = ()=>{
             this.state = "settled";
-            API.call("interruptionWaitingRoom", {roomCode: this.roomCode, playerCode: this.playerCode, mode: "free"}, (response)=>{
+            API.call("stopMatching", {roomCode: this.roomCode, playerCode: this.playerCode, mode: "free"}, (response)=>{
                 document.getElementById("games_outer").style.display = "block";
                 document.getElementById("message").innerText = "";
                 document.getElementById("message").style.display = "none";
             });
             document.getElementById("cancel_button").style.display = "none";
-            document.getElementById("cancel_button").removeEventListener("click", interruption);
+            document.getElementById("cancel_button").removeEventListener("click", stopMatching);
         }
-        this.interruption = interruption;
-        document.getElementById("cancel_button").addEventListener("click", interruption);
+        this.stopMatching = stopMatching;
+        document.getElementById("cancel_button").addEventListener("click", stopMatching);
         document.getElementById("cancel_button").style.display = "block";
         document.getElementById("games_outer").style.display = "none";
         document.getElementById("message").innerText = "対戦相手を待っています";
@@ -117,7 +117,7 @@ class OnlineRoom{
     }
     
     start(){
-        document.getElementById("cancel_button").removeEventListener("click", this.interruption);
+        document.getElementById("cancel_button").removeEventListener("click", this.stopMatching);
         OPERATION_ELEMENT.readyElement();
         const players = [new Player("あなた"), new OnlinePlayer("相手", "free", this.roomCode, this.playerCode)]
         const player1 = players[this.playerNum - 1];
