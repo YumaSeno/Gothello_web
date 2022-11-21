@@ -1,7 +1,7 @@
 'use strict';
 import { API } from "./apiCall.js"
 
-class _UnplayblePlayer{
+export class _UnplayblePlayer{
     name = "";
     gothello = null;
     placedPiece(x, y){}
