@@ -3,17 +3,24 @@
     --vh: 1vh;
     --vmin: 1vh;
 }
+/*スクロールバー全体*/
 ::-webkit-scrollbar {
     width: 10px;
-    height: 10px;
 }
- 
-::-webkit-scrollbar-thumb {
-    background: #a9a9a9;
-    border-radius: 5px;
-}
+
+/*スクロールバーの軌道*/
 ::-webkit-scrollbar-track {
-    background: #f0f0f0;
+    background-color: #d8d8d8;
+}
+
+/*スクロールバーの動く部分*/
+::-webkit-scrollbar-thumb {
+    background-color: #c1c1c1;
+    border-radius: 1000px;
+    border: solid 2px transparent;
+    border-right: solid 1px transparent;
+    box-sizing: border-box;
+    background-clip: padding-box;
 }
 
 body{
@@ -123,15 +130,16 @@ body{
     font-size: calc(4.3 * var(--vh, vh));
 }
 
-#games_outer{
+#main_outer{
     position: relative;
     display: block;
     width: 600px;
-    height: calc(85 * var(--vh, vh));
+    height: calc(83.5 * var(--vh, vh));
     max-width: calc(91 * var(--vw, vw));
     left: 50%;
     margin-top: calc(3 * var(--vh, vh));
     border-radius: 15px;
+    padding: calc(1 * var(--vh, vh));
     overflow-x: hidden;
     overflow-y: hidden;
     transform: translate(-50%, 0);
@@ -143,26 +151,110 @@ body{
     display: block;
     width: 100%;
     height: 100%;
+    border-radius: 12px;
+    border: solid 3px #cacaca;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+#games_inner{
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
     overflow-x: hidden;
     overflow-y: auto;
+    background-color: #bcbcbc;
 }
 .game_selector{
-    height: 15%;
+    height: calc(11 * var(--vh, vh));
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: calc(2.7 * var(--vh, vh));
     cursor: pointer;
-    border-bottom: solid 3px #bcbcbc;
+    border-bottom: solid 3px #aeaeae;
+    box-sizing: border-box;
 }
-.game_selector.offline_mode{
-    background-color: #bbbbbb;
+.game_selector:last-of-type{
+    border-bottom: none;
 }
-.game_selector.monkey_mode{
-    background-color: #d2d1d1;
+.game_selector#show_help{
+    background-color: #ececec;
 }
-.game_selector.free_online_mode{
-    background-color: #e6e6e6;
+.game_selector#offline_mode{
+    background-color: #bdbdbd;
+}
+.game_selector#monkey_mode{
+    background-color: #d3d3d3;
+}
+.game_selector#free_online_mode{
+    background-color: #ececec;
+}
+.game_selector#private_start{
+    background-color: #bdbdbd;
+}
+.game_selector#private_join{
+    background-color: #d3d3d3;
+}
+
+#help{
+    position: relative;
+    display: none;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    border: solid 3px #cacaca;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+#help_inner{
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 0 calc(2.7 * var(--vh, vh));
+    background-color: #ebebeb;
+}
+
+#help h1{
+    font-size: calc(3.2 * var(--vh, vh));
+    margin-top: calc(2.7 * var(--vh, vh));
+    text-decoration: underline;
+}
+#help h2{
+    font-size: calc(3 * var(--vh, vh));
+    margin-top: calc(2.5* var(--vh, vh));
+}
+#help h3{
+    font-size: calc(2.8 * var(--vh, vh));
+    margin-top: calc(1.5* var(--vh, vh));
+}
+#help h4{
+    font-size: calc(2.5 * var(--vh, vh));
+    margin-top: calc(1.1* var(--vh, vh));
+}
+#help h5{
+    font-size: calc(2.2 * var(--vh, vh));
+    margin-top: calc(.9* var(--vh, vh));
+}
+#help p{
+    font-size: calc(2.2 * var(--vh, vh));
+    margin-top: calc(.9* var(--vh, vh));
+}
+#help img{
+    width: 100%;
+    height: auto;
+    margin-top: calc(2* var(--vh, vh));
+}
+#help .separator{
+    width: 100%;
+    height: 2px;
+    margin-top: calc(2* var(--vh, vh));
+    background-color: #6a6a6a;
 }
 
 #board{

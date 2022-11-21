@@ -42,7 +42,7 @@ export class Gothello{
         const opponentnum = this._getPlayerNum(player) == 1 ? 2 : 1;
         this._players[opponentnum-1].conceded();
         this._turnPlayer = this._players[opponentnum-1];
-        this._settled("投了されました。");
+        this._settled("投了されました");
     }
 
     _getPlayerNum(player){

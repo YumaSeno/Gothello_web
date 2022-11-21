@@ -23,18 +23,44 @@
     
     <p id="message"></p>
 
-    <div id="games_outer">
+    <div id="main_outer">
         <div id="games">
-            <div class="game_selector offline_mode">ローカル対戦</div>
-            <div class="game_selector monkey_mode">猿と対戦</div>
-            <div class="game_selector free_online_mode">フリーマッチ</div>
-            <!--div class="game_selector private_start">プライベートルームを作成</div>
-            <div class="game_selector private_join">プライベートルームに参加</div-->
+            <div id="games_inner">
+                <div class="game_selector" id="show_help">ヘルプを見る</div>
+                <div class="game_selector" id="offline_mode">ローカル対戦</div>
+                <div class="game_selector" id="monkey_mode">猿と対戦</div>
+                <div class="game_selector" id="free_online_mode">フリーマッチ</div>
+                <div class="game_selector" id="private_start">プライベートマッチを作成</div>
+                <div class="game_selector" id="private_join">プライベートマッチに参加</div>
+            </div>
+        </div>
+        <div id="help">
+            <div id="help_inner">
+                <h1>ゲームの手順</h1>
+                <p>ゴセロはオセロと五目並べを合わせたゲームです。<br></p>
+                <div class="separator"></div>
+                <h1>ゲームの手順</h1>
+                <h2>h2</h2>
+                <h3>h3</h3>
+                <h4>h4</h4>
+                <h5>h5</h5>
+                <p>p</p>
+                <h1>ゲームの手順</h1>
+                <p>ゴセロはオセロと五目並べを合わせたゲームです。</p>
+                <div class="separator"></div>
+                <h1>ゲームの手順</h1>
+                <h2>h2</h2>
+                <h3>h3</h3>
+                <h4>h4</h4>
+                <h5>h5</h5>
+                <p>p</p>
+            </div>
         </div>
     </div>
 
     <div id="board"></div>
     
+
     <script>
         (()=>{
             document.getElementById("games").style.display = "block";
