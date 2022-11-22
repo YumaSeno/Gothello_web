@@ -77,7 +77,7 @@ export class AIPlayer extends _UnplayblePlayer{
                 if (depth <= 1){
                     evals.push(this._evalNode(boardClone));
                 }else{
-                    evals.push(this._getBestNextPlace(boardClone, depth - 1, !isMe));
+                    evals.push(this._getBestEval(boardClone, depth - 1, !isMe));
                 }
             }
         }
