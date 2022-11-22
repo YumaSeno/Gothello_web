@@ -75,15 +75,28 @@ export class Gothello{
         if (state >= 3) return;
         if (state == opponentnum) return;
         
-        this._players[opponentnum-1].placedPiece(x, y);
-        
         if (state == playernum) this.board[x][y].setState(state + 2);
         
         if (state == 0) if (!this._placeNewPiece(playernum,x,y)) return;
+        
+        let canPlace = false;
+        for (let x = 0; x < this.board.length; x++) {
+            for (let y = 0; y < this.board[x].length; y++) {
+                if(this.canPlacePiece(this._players[opponentnum-1], x, y)){
+                    canPlace = true;
+                }
+            }
+        }
+        if(!canPlace){
+            this._settled("置ける場所がありません");
+            return;
+        }
 
+        this._players[opponentnum-1].placedPiece(x, y);
         this._turnPlayer = this._players[opponentnum-1];
         this.onPlacesPiece(x,y);
         this.turn++;
+
     }
 
     _placeNewPiece(playernum, x, y){
@@ -110,6 +123,46 @@ export class Gothello{
             this._settled("");
             return false;
         }
+
+        return true;
+    }
+    
+    canPlacePiece(player, x, y){
+        this.isPlayerTurn(player);
+        const board = this._getBoardInt();
+        const playernum = this.getPlayerNum(player);
+
+        if (board[x] == undefined || board[x][y] == undefined)
+        throw new Error("入力エラー001 : 開発者に報告してください。");
+
+        const opponentnum = playernum == 1 ? 2 : 1;
+        
+        if (board[x][y] >= 3) return false;
+        if (board[x][y] == opponentnum) return false;
+        
+        if (board[x][y] == playernum) return true;
+        
+        if (board[x][y] == 0) return this._canPlaceNewPiece(board, playernum, x, y);
+
+        return true;
+    }
+
+    _canPlaceNewPiece(board, playernum, x, y){
+        const opponentnum = playernum == 1 ? 2 : 1;
+
+        board[x][y] = playernum;
+        if(this.turn == 2)board[x][y] += 2;
+
+        let turnedOver = false;
+        try {
+            turnedOver = this._turnOver(playernum, x, y, board);
+        } catch {
+            return false;
+        }
+
+        let victory = this._isVictory(playernum, board);
+
+        if(turnedOver && victory)return false;
 
         return true;
     }

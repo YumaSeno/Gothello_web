@@ -26,7 +26,7 @@ export class AIPlayer extends _UnplayblePlayer{
             for (let x = 0; x < board.length; x++) {
                 for (let y = 0; y < board[x].length; y++) {
                     const boardClone = this._getBoardClone(board);
-                    if(!this._placeBoardPiece(boardClone, this, x, y)){
+                    if(!this._placeBoardPiece(boardClone, playerNum, x, y)){
                         continue;
                     }
                     let evalNum = 0;
@@ -54,18 +54,19 @@ export class AIPlayer extends _UnplayblePlayer{
             const bestPlace = bestPlaces[Math.floor(Math.random() * bestPlaces.length)];
 
             this._placePiece(bestPlace.x, bestPlace.y);
-        }, 50);
+        }, 300);
     }
 
     _getBestNextPlace(board, depth, isMe){
         const playerNum = isMe ? this.gothello.getPlayerNum(this) : this.gothello.getPlayerNum(this) % 2 + 1;
+        const opponentnum = playerNum === 1 ? 2 : 1;
 
         const evals = [];
         
         for (let x = 0; x < board.length; x++) {
             for (let y = 0; y < board[x].length; y++) {
                 const boardClone = this._getBoardClone(board);
-                if(!this._placeBoardPiece(this._getBoardClone(board), this, x, y)){
+                if(!this._placeBoardPiece(boardClone, playerNum, x, y)){
                     continue;
                 }
                 if(this._isVictory(playerNum, boardClone)){
@@ -115,9 +116,7 @@ export class AIPlayer extends _UnplayblePlayer{
         return evalNum;
     }
     
-    _placeBoardPiece(board, player, x, y){
-        const playernum = this.gothello.getPlayerNum(player);
-
+    _placeBoardPiece(board, playernum, x, y){
         const opponentnum = playernum === 1 ? 2 : 1;
         
         if (board[x][y] >= 3) return false;
@@ -133,7 +132,7 @@ export class AIPlayer extends _UnplayblePlayer{
                 for (const dire_x of directions) {
                     let _x = x + dire_x;
                     let _y = y + dire_y;
-                    for (let i = 0; i < 1; i++) {
+                    for (let i = 0; i < 2; i++) {
                         if((_x < 0 || _x >= 9 || _y < 0 || _y >= 9) || (_x == 0 && _y == 0)) continue;
                         if(board[x + dire_x][y + dire_y] != 0){
                             isIsolation = false;
