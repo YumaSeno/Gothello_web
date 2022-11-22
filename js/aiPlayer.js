@@ -29,12 +29,13 @@ export class AIPlayer extends _UnplayblePlayer{
                     if(!this._placeBoardPiece(boardClone, playerNum, x, y)){
                         continue;
                     }
-                    let evalNum = 0;
+                    
                     if(this._isVictory(playerNum, boardClone)){
-                        evalNum = 1000;
-                    }else{
-                        evalNum = this._getBestNextPlace(boardClone, 2, false);
+                        this._placePiece(x, y);
+                        return;
                     }
+
+                    let evalNum = this._getBestNextPlace(boardClone, 2, false);
                     if(evalNum > maxEval){
                         maxEval = evalNum;
                     }
@@ -70,9 +71,10 @@ export class AIPlayer extends _UnplayblePlayer{
                     continue;
                 }
                 if(this._isVictory(playerNum, boardClone)){
-                    evals.push(isMe ? 1000 : -1000);
-                    break;
-                }else if (depth <= 1){
+                    return isMe ? 1000 : -1000;
+                }
+                
+                if (depth <= 1){
                     evals.push(this._evalNode(boardClone));
                 }else{
                     evals.push(this._getBestNextPlace(boardClone, depth - 1, !isMe));
@@ -132,7 +134,7 @@ export class AIPlayer extends _UnplayblePlayer{
                 for (const dire_x of directions) {
                     let _x = x + dire_x;
                     let _y = y + dire_y;
-                    for (let i = 0; i < 2; i++) {
+                    for (let i = 0; i < 1; i++) {
                         if((_x < 0 || _x >= 9 || _y < 0 || _y >= 9) || (_x == 0 && _y == 0)) continue;
                         if(board[x + dire_x][y + dire_y] != 0){
                             isIsolation = false;
@@ -219,8 +221,8 @@ export class AIPlayer extends _UnplayblePlayer{
                     for (const dire_x of directions) {
                         if(dire_y === 0 && dire_x === 0) continue;
                         let count = 0;
-                        let _x = x + dire_x;
-                        let _y = y + dire_y;
+                        let _x = x;
+                        let _y = y;
                         while(_x >= 0 && _y >= 0 && _x < board[0].length && _y < board.length){
                             if ((board[_x][_y] != 0) && ((board[_x][_y] - 1) % 2 + 1 != opponentnum)){
                                 count++;

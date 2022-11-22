@@ -3,7 +3,6 @@ import { Gothello } from "./gothello.js";
 import { DrawablePiece } from "./drawablePiece.js";
 import { Player, OnlinePlayer } from "./player.js";
 import { AIPlayer } from "./aiPlayer.js";
-//import { AIPlayer } from "./aiPlayerDev.js";
 
 const OPERATION_ELEMENT = {
     readyElement(){
@@ -20,8 +19,6 @@ const OPERATION_ELEMENT = {
         document.getElementById("message").innerText = "";
         document.getElementById("message").style.display = "none";
         document.getElementById("cancel_button").removeEventListener("click", OPERATION_ELEMENT.undoElement);
-        
-        //location.reload();
     }, 
     onSettled(message){
         document.getElementById("message").innerText = message;
@@ -143,8 +140,6 @@ export class AIRoom extends _UnplaybleRoom {
         const playerNum = Math.floor(Math.random() * 2);
         const player1 = players[playerNum];
         const player2 = players[(playerNum + 1) % 2];
-        //const player1 = players[0];
-        //const player2 = players[1];
         this._gamestart(
             player1,
             player2,

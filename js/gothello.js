@@ -216,8 +216,8 @@ export class Gothello{
                     for (const dire_x of directions) {
                         if(dire_y == 0 && dire_x == 0) continue;
                         let count = 0;
-                        let _x = x + dire_x;
-                        let _y = y + dire_y;
+                        let _x = x;
+                        let _y = y;
                         while(_x >= 0 && _y >= 0 && _x < board[0].length && _y < board.length){
                             if ((board[_x][_y] != 0) && ((board[_x][_y] - 1) % 2 + 1 != opponentnum)){
                                 count++;
