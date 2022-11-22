@@ -35,7 +35,7 @@ export class AIPlayer extends _UnplayblePlayer{
                         return;
                     }
 
-                    let evalNum = this._getBestNextPlace(boardClone, 2, false);
+                    let evalNum = this._getBestEval(boardClone, 2, false);
                     if(evalNum > maxEval){
                         maxEval = evalNum;
                     }
@@ -58,7 +58,7 @@ export class AIPlayer extends _UnplayblePlayer{
         }, 300);
     }
 
-    _getBestNextPlace(board, depth, isMe){
+    _getBestEval(board, depth, isMe){
         const playerNum = isMe ? this.gothello.getPlayerNum(this) : this.gothello.getPlayerNum(this) % 2 + 1;
         const opponentnum = playerNum === 1 ? 2 : 1;
 
