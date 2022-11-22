@@ -39,13 +39,13 @@ export class Gothello{
     }
 
     conced(player){
-        const opponentnum = this._getPlayerNum(player) == 1 ? 2 : 1;
+        const opponentnum = this.getPlayerNum(player) == 1 ? 2 : 1;
         this._players[opponentnum-1].conceded();
         this._turnPlayer = this._players[opponentnum-1];
         this._settled("投了されました");
     }
 
-    _getPlayerNum(player){
+    getPlayerNum(player){
         let playernum = 0;
         for(const p of this._players) {
             playernum++;
@@ -64,7 +64,7 @@ export class Gothello{
 
     placePiece(player, x, y){
         this.isPlayerTurn(player);
-        const playernum = this._getPlayerNum(player);
+        const playernum = this.getPlayerNum(player);
 
         if (this.board[x] == undefined || this.board[x][y] == undefined)
         throw new Error("入力エラー001 : 開発者に報告してください。");
