@@ -160,9 +160,7 @@ export class OnlineRoom extends _UnplaybleRoom {
     state = "waiting";
     stopMatching = null;
 
-    constructor(){
-        super();
-
+    startMatching(){
         const stopMatching = ()=>{
             this.state = "settled";
             API.call("stopMatching", {roomCode: this.roomCode, playerCode: this.playerCode, mode: "free"}, (response)=>{
@@ -237,51 +235,47 @@ export class PrivateOnlineRoom extends _UnplaybleRoom {
     state = "waiting";
     stopMatching = null;
 
-    constructor(CreateRoom, roomCode){
-        super();
+    createRoom(){
+        const stopMatching = ()=>{
+            this.state = "settled";
+            API.call("stopMatching", {roomCode: this.roomCode, playerCode: this.playerCode, mode: "private"}, (response)=>{
+                document.getElementById("main_outer").style.display = "block";
+                document.getElementById("message").innerText = "";
+                document.getElementById("message").style.display = "none";
+            });
+            document.getElementById("cancel_button").style.display = "none";
+            document.getElementById("cancel_button").removeEventListener("click", stopMatching);
+        }
+        this.stopMatching = stopMatching;
+        document.getElementById("cancel_button").addEventListener("click", stopMatching);
+        document.getElementById("cancel_button").style.display = "block";
+        document.getElementById("main_outer").style.display = "none";
+        document.getElementById("message").style.display = "flex";
+        document.getElementById("message").innerText = "ルーム作成中";
+        API.call("createPrivateRoom", {}, (response)=>{
+            this.roomCode = response.room;
+            this.playerNum = response.playerNum;
+            this.playerCode = response.playerCode;
+            document.getElementById("message").innerText = `ルームコード：${this.roomCode}`;
+            this.checkRoomState();
+        });
+    }
 
-        if(CreateRoom){
-            const stopMatching = ()=>{
-                this.state = "settled";
-                API.call("stopMatching", {roomCode: this.roomCode, playerCode: this.playerCode, mode: "private"}, (response)=>{
-                    document.getElementById("main_outer").style.display = "block";
-                    document.getElementById("message").innerText = "";
-                    document.getElementById("message").style.display = "none";
-                });
-                document.getElementById("cancel_button").style.display = "none";
-                document.getElementById("cancel_button").removeEventListener("click", stopMatching);
-            }
-            this.stopMatching = stopMatching;
-            document.getElementById("cancel_button").addEventListener("click", stopMatching);
-            document.getElementById("cancel_button").style.display = "block";
-            document.getElementById("main_outer").style.display = "none";
-            document.getElementById("message").style.display = "flex";
-            document.getElementById("message").innerText = "ルーム作成中";
-            API.call("createPrivateRoom", {}, (response)=>{
-                this.roomCode = response.room;
+    joinRoom(roomCode){
+        API.call("joinPrivateRoom", {roomCode: roomCode}, (response)=>{
+            if(!response.joined){
+                alert("ルームが存在しません");
+                OPERATION_ELEMENT.undoElement();
+            }else{
+                this.roomCode = roomCode;
                 this.playerNum = response.playerNum;
                 this.playerCode = response.playerCode;
-                document.getElementById("message").innerText = `ルームコード：${this.roomCode}`;
+                document.getElementById("main_outer").style.display = "none";
+                document.getElementById("message").style.display = "flex";
+                document.getElementById("message").innerText = "参加中";
                 this.checkRoomState();
-            });
-
-        }else{
-            API.call("joinPrivateRoom", {roomCode: roomCode}, (response)=>{
-                console.log(response);
-                if(!response.joined){
-                    alert("ルームが存在しません");
-                    OPERATION_ELEMENT.undoElement();
-                }else{
-                    this.roomCode = roomCode;
-                    this.playerNum = response.playerNum;
-                    this.playerCode = response.playerCode;
-                    document.getElementById("main_outer").style.display = "none";
-                    document.getElementById("message").style.display = "flex";
-                    document.getElementById("message").innerText = "参加中";
-                    this.checkRoomState();
-                }
-            });
-        }
+            }
+        });
     }
 
     checkRoomState(){
