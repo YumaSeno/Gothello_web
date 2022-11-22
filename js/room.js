@@ -135,13 +135,15 @@ export class OfflineRoom extends _UnplaybleRoom {
     }
 }
 
-export class MonkeyRoom extends _UnplaybleRoom {
+export class AIRoom extends _UnplaybleRoom {
     start(){
         OPERATION_ELEMENT.readyElement();
         const players = [new Player("あなた"), new AIPlayer(" AI ")]
         const playerNum = Math.floor(Math.random() * 2);
-        const player1 = players[playerNum];
-        const player2 = players[(playerNum + 1) % 2];
+        //const player1 = players[playerNum];
+        //const player2 = players[(playerNum + 1) % 2];
+        const player1 = players[0];
+        const player2 = players[1];
         this._gamestart(
             player1,
             player2,

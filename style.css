@@ -185,7 +185,7 @@ body{
 .game_selector#offline_mode{
     background-color: #bdbdbd;
 }
-.game_selector#monkey_mode{
+.game_selector#ai_mode{
     background-color: #d3d3d3;
 }
 .game_selector#free_online_mode{

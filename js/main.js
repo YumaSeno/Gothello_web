@@ -1,6 +1,6 @@
 'use strict';
 import { API } from "./apiCall.js"
-import { OfflineRoom, MonkeyRoom, OnlineRoom, PrivateOnlineRoom } from "./room.js";
+import { OfflineRoom, AIRoom, OnlineRoom, PrivateOnlineRoom } from "./room.js";
 
 //サーバー側に残っているルームを削除
 API.call("checkDisconnectedRoom");
@@ -16,8 +16,8 @@ function selectGame(element){
         room.start();
     }
 
-    if(element.id == "monkey_mode"){
-        const room = new MonkeyRoom();
+    if(element.id == "ai_mode"){
+        const room = new AIRoom();
         room.start();
     }
     
