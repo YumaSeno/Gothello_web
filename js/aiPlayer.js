@@ -134,7 +134,7 @@ export class AIPlayer extends _UnplayblePlayer{
                 for (const dire_x of directions) {
                     let _x = x + dire_x;
                     let _y = y + dire_y;
-                    for (let i = 0; i < 1; i++) {
+                    for (let i = 0; i < 2; i++) {
                         if((_x < 0 || _x >= 9 || _y < 0 || _y >= 9) || (_x == 0 && _y == 0)) continue;
                         if(board[x + dire_x][y + dire_y] != 0){
                             isIsolation = false;
