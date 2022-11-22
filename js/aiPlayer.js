@@ -46,11 +46,10 @@ export class AIPlayer extends _UnplayblePlayer{
                 this._conced();
                 return;
             }
+            
             const bestPlaces = [];
             for (const place of places) {
-                if(place.eval == maxEval){
-                    bestPlaces.push(place);
-                }
+                if(place.eval == maxEval) bestPlaces.push(place);
             }
             const bestPlace = bestPlaces[Math.floor(Math.random() * bestPlaces.length)];
 
