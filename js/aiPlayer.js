@@ -104,8 +104,10 @@ export class AIPlayer extends _UnplayblePlayer{
                 const num = board[x][y] >= 3 ? board[x][y] - 2 : board[x][y];
                 if(num === playerNum){
                     evalNum++;
+                    if(x == 4 && y == 4) evalNum += 0.5;
                 }else if(num === opponentnum){
                     evalNum--;
+                    if(x == 4 && y == 4) evalNum -= 0.5;
                 }
             }
         }

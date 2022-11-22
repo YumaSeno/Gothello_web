@@ -1,10 +1,14 @@
 'use strict';
 import { API } from "./apiCall.js"
-import { OfflineRoom, MonkeyRoom, OnlineRoom } from "./room.js";
+import { OfflineRoom, MonkeyRoom, OnlineRoom, PrivateOnlineRoom } from "./room.js";
 
 //サーバー側に残っているルームを削除
 API.call("checkDisconnectedRoom");
 
+//選択ボタンにイベントを付与
+for (const element of document.getElementsByClassName("game_selector")) {
+    element.addEventListener("click", ()=>selectGame(element));
+}
 
 function selectGame(element){
     if(element.id == "offline_mode"){
@@ -22,11 +26,21 @@ function selectGame(element){
     }
 
     if(element.id == "private_start"){
-        const room = new OnlineRoom();
+        const room = new PrivateOnlineRoom(true);
     }
 
     if(element.id == "private_join"){
-        const room = new OnlineRoom();
+        try {
+            const roomCode = prompt("ルームコードを入力してください。");
+            if(roomCode.match(/^\d\d\d\d$/)){
+                const room = new PrivateOnlineRoom(false, roomCode);
+            }else{
+                alert("ルームコードは4桁の半角数字で入力してください。")
+            }
+        } catch (error) {
+            alert(error);
+            location.reload();
+        }
     }
 
     if(element.id == "show_help"){
@@ -44,8 +58,4 @@ function selectGame(element){
 
         document.getElementById("cancel_button").addEventListener("click", hideHelp);
     }
-}
-
-for (const element of document.getElementsByClassName("game_selector")) {
-    element.addEventListener("click", ()=>selectGame(element));
 }

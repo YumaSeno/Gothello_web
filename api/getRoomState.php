@@ -2,13 +2,13 @@
 header('Content-Type: application/json');
 
 function getLooms($path){
-    $freeLooms = [];
+    $looms = [];
     foreach (glob("$path*") as $folderFullName) {
         $folderName = basename($folderFullName);
         if (preg_match("/^[0-9]{4}$/", $folderName)) 
-            $freeLooms[] = $folderName;
+            $looms[] = $folderName;
     }
-    return $freeLooms;
+    return $looms;
 }
 
 function removeRoom($path, $room){
@@ -28,14 +28,17 @@ function remove_directory($dir) {
 }
 
 function main(){
-    $roomCode = $_POST["roomCode"];
-    $playerCode = $_POST["playerCode"];
-    if(!isset($roomCode) || !isset($playerCode)){
+    if(!isset($_POST["roomCode"]) ||
+       !isset($_POST["playerCode"]) ||
+       !isset($_POST["mode"])){
         echo "error - パラメ-ータが足りません。";
         exit;
     }
+    $roomCode = $_POST["roomCode"];
+    $playerCode = $_POST["playerCode"];
+    $mode = $_POST["mode"];
 
-    $path = "../games/free/";
+    $path = "../games/$mode/";
     
     if(!file_exists($path . (string)$roomCode)){
         echo '{"state" : "removed"}';

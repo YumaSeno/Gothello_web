@@ -49,7 +49,7 @@ function main(){
     }
     $roomCode = $_POST["roomCode"];
     
-    $path = "../games/free/$roomCode";
+    $path = "../games/private/$roomCode";
 
     if(!file_exists($path)){
         echo '{"joined" : false}';

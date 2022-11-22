@@ -138,13 +138,15 @@ export class OfflineRoom extends _UnplaybleRoom {
 export class MonkeyRoom extends _UnplaybleRoom {
     start(){
         OPERATION_ELEMENT.readyElement();
-        const player1 = new Player("You");
-        const player2 = new AIPlayer("Monkey");
+        const players = [new Player("あなた"), new AIPlayer(" AI ")]
+        const playerNum = Math.floor(Math.random() * 2);
+        const player1 = players[playerNum];
+        const player2 = players[(playerNum + 1) % 2];
         this._gamestart(
             player1,
             player2,
-            [player1],
-            (winner) => OPERATION_ELEMENT.onSettled(`You ${winner.name == "You" ? "Win!" : "Lose..."}`)
+            [players[0]],
+            (winner) => OPERATION_ELEMENT.onSettled(`You ${winner.name == "あなた" ? "Win!" : "Lose..."}`)
         );
     }
 }
@@ -175,7 +177,7 @@ export class OnlineRoom extends _UnplaybleRoom {
         document.getElementById("main_outer").style.display = "none";
         document.getElementById("message").innerText = "対戦相手を待っています";
         document.getElementById("message").style.display = "flex";
-        API.call("getFreeRoomCode", {}, (response)=>{
+        API.call("startFreeRoom", {}, (response)=>{
             this.roomCode = response.room;
             this.playerNum = response.playerNum;
             this.playerCode = response.playerCode;
@@ -184,7 +186,7 @@ export class OnlineRoom extends _UnplaybleRoom {
     }
 
     checkRoomState(){
-        API.call("getRoomState", {roomCode: this.roomCode, playerCode: this.playerCode}, (response)=>{
+        API.call("getRoomState", {roomCode: this.roomCode, playerCode: this.playerCode, mode: "free"}, (response)=>{
             if (this.state == "settled")return;
 
             if (response.state == "removed"){
@@ -236,32 +238,52 @@ export class PrivateOnlineRoom extends _UnplaybleRoom {
     constructor(CreateRoom, roomCode){
         super();
 
-        const stopMatching = ()=>{
-            this.state = "settled";
-            API.call("stopMatching", {roomCode: this.roomCode, playerCode: this.playerCode, mode: "free"}, (response)=>{
-                document.getElementById("main_outer").style.display = "block";
-                document.getElementById("message").innerText = "";
-                document.getElementById("message").style.display = "none";
+        if(CreateRoom){
+            const stopMatching = ()=>{
+                this.state = "settled";
+                API.call("stopMatching", {roomCode: this.roomCode, playerCode: this.playerCode, mode: "private"}, (response)=>{
+                    document.getElementById("main_outer").style.display = "block";
+                    document.getElementById("message").innerText = "";
+                    document.getElementById("message").style.display = "none";
+                });
+                document.getElementById("cancel_button").style.display = "none";
+                document.getElementById("cancel_button").removeEventListener("click", stopMatching);
+            }
+            this.stopMatching = stopMatching;
+            document.getElementById("cancel_button").addEventListener("click", stopMatching);
+            document.getElementById("cancel_button").style.display = "block";
+            document.getElementById("main_outer").style.display = "none";
+            document.getElementById("message").style.display = "flex";
+            document.getElementById("message").innerText = "ルーム作成中";
+            API.call("createPrivateRoom", {}, (response)=>{
+                this.roomCode = response.room;
+                this.playerNum = response.playerNum;
+                this.playerCode = response.playerCode;
+                document.getElementById("message").innerText = `ルームコード：${this.roomCode}`;
+                this.checkRoomState();
             });
-            document.getElementById("cancel_button").style.display = "none";
-            document.getElementById("cancel_button").removeEventListener("click", stopMatching);
+
+        }else{
+            API.call("joinPrivateRoom", {roomCode: roomCode}, (response)=>{
+                console.log(response);
+                if(!response.joined){
+                    alert("ルームが存在しません");
+                    OPERATION_ELEMENT.undoElement();
+                }else{
+                    this.roomCode = roomCode;
+                    this.playerNum = response.playerNum;
+                    this.playerCode = response.playerCode;
+                    document.getElementById("main_outer").style.display = "none";
+                    document.getElementById("message").style.display = "flex";
+                    document.getElementById("message").innerText = "参加中";
+                    this.checkRoomState();
+                }
+            });
         }
-        this.stopMatching = stopMatching;
-        document.getElementById("cancel_button").addEventListener("click", stopMatching);
-        document.getElementById("cancel_button").style.display = "block";
-        document.getElementById("main_outer").style.display = "none";
-        document.getElementById("message").innerText = "対戦相手を待っています";
-        document.getElementById("message").style.display = "flex";
-        API.call("getFreeRoomCode", {}, (response)=>{
-            this.roomCode = response.room;
-            this.playerNum = response.playerNum;
-            this.playerCode = response.playerCode;
-            this.checkRoomState()
-        });
     }
 
     checkRoomState(){
-        API.call("getRoomState", {roomCode: this.roomCode, playerCode: this.playerCode}, (response)=>{
+        API.call("getRoomState", {roomCode: this.roomCode, playerCode: this.playerCode, mode: "private"}, (response)=>{
             if (this.state == "settled")return;
 
             if (response.state == "removed"){
@@ -274,11 +296,6 @@ export class PrivateOnlineRoom extends _UnplaybleRoom {
             }
             this.state = response.state;
 
-            document.getElementById("message").innerText = document.getElementById("message").innerText + ".";
-
-            if (document.getElementById("message").innerText == "対戦相手を待っています....")
-                document.getElementById("message").innerText = "対戦相手を待っています";
-
             setTimeout(()=>{
                 this.checkRoomState();
             }, 2000);
@@ -286,9 +303,9 @@ export class PrivateOnlineRoom extends _UnplaybleRoom {
     }
     
     _start(){
-        document.getElementById("cancel_button").removeEventListener("click", this.stopMatching);
+        if (this.stopMatching) document.getElementById("cancel_button").removeEventListener("click", this.stopMatching);
         OPERATION_ELEMENT.readyElement();
-        const players = [new Player("あなた"), new OnlinePlayer("相手", "free", this.roomCode, this.playerCode)]
+        const players = [new Player("あなた"), new OnlinePlayer("相手", "private", this.roomCode, this.playerCode)]
         const player1 = players[this.playerNum - 1];
         const player2 = players[this.playerNum % 2];
         this._gamestart(
