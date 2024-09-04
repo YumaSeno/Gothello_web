@@ -70,6 +70,7 @@ function remove_directory($dir) {
 function main(){
     $canEnterRooms = [];
     $path = "../games/free/";
+    if(strlen($path) > 0 && !is_dir($path)) mkdir($path, 0777, true);
     foreach (getLooms($path) as $room) {
         $player_1_state = json_decode(file_get_contents($path . (string)$room . "/player_1_state.json"), true);
         $player_2_state = json_decode(file_get_contents($path . (string)$room . "/player_2_state.json"), true);
