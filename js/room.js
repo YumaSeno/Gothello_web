@@ -1,6 +1,5 @@
 import { API } from "./apiCall.js"
-import { Gothello } from "./gothello.js";
-import { DrawablePiece } from "./drawablePiece.js";
+import { Board } from "./board.js";
 import { Player, OnlinePlayer } from "./player.js";
 import { AIPlayer } from "./aiPlayer.js";
 
@@ -29,12 +28,12 @@ const OPERATION_ELEMENT = {
 
 export class _UnplaybleRoom{
     operablePlayers = [null];
-    gothello = null;
+    board = null;
     
     _gamestart(player1, player2, operablePlayers, onSettled){
         const _conced = ()=>{
             let currentPlayer = null;
-            for (const player of this.operablePlayers) {if (this.gothello.isPlayerTurn(player)) currentPlayer = player;}
+            for (const player of this.operablePlayers) {if (this.board.isPlayerTurn(player)) currentPlayer = player;}
 
             if (!currentPlayer){
                 alert("自分のターンにしか投了はできません");
@@ -55,35 +54,66 @@ export class _UnplaybleRoom{
         let isSettled = false;
 
         this.operablePlayers = operablePlayers;
-        this.gothello = this._gothelloInitialize(player1, player2);
-        this.gothello.onPlacesPiece = (x, y) => {
-            if(!isSettled)document.getElementById("player_name").innerText = this.gothello.getTurnPlayer().name;
-            if(this.gothello.getTurnPlayer() == player1){
-                document.getElementById("player_name").className = "black";
-            }else{
-                document.getElementById("player_name").className = "white";
+        const pieceElements = this._boardElementInitialize();
+        this.board = new Board(
+            player1
+            ,player2 
+            ,(x, y) => {
+                if(!isSettled){
+                    document.getElementById("player_name").innerText = this.board.getTurnPlayer().name;
+                    if(this.board.getTurnPlayer() == player1){
+                        document.getElementById("player_name").className = "black";
+                    }else{
+                        document.getElementById("player_name").className = "white";
+                    }
+                }
+
+                const board = this.board.getBoard();
+
+                for(let _x = 0; _x < board.length; _x++){
+                    const row = [];
+                    for(let _y = 0; _y < board.length; _y++){
+                        switch(board[_x][_y]){
+                            case 0:
+                                pieceElements[_x][_y].className = "piece ";
+                            break;
+                            case 1:
+                                pieceElements[_x][_y].className = "piece black";
+                            break;
+                            case 2:
+                                pieceElements[_x][_y].className = "piece white";
+                            break;
+                            case 3:
+                                pieceElements[_x][_y].className = "piece black sole";
+                            break;
+                            case 4:
+                                pieceElements[_x][_y].className = "piece white sole";
+                            break;
+                        }
+                    }
+                }
             }
-        }
-        this.gothello.onSettled = (player, message) => {
-            removeButtonConcedEvent()
-            isSettled = true;
-            setTimeout(()=>{
-                onSettled(player, message);
-            }, 100);
-        }
+            ,(player, message) => {
+                removeButtonConcedEvent()
+                isSettled = true;
+                setTimeout(()=>{
+                    onSettled(player, message);
+                }, 100);
+            }
+        );
     }
 
-    _gothelloInitialize(player1, player2){
-        const board = [];
+    _boardElementInitialize(player1, player2){
+        const pieceElements = [];
         const boardElement = document.getElementById("board");
         while (boardElement.firstChild) boardElement.removeChild(boardElement.firstChild);
-        for(let y = 0; y < 9; y++){
+        for(let x = 0; x < 9; x++){
             const rowElement = document.createElement("div");
             rowElement.className = "row";
             const rowSeparatorElement = document.createElement("div");
             rowSeparatorElement.className = "row_separator";
             const row = [];
-            for(let x = 0; x < 9; x++){
+            for(let y = 0; y < 9; y++){
                 let separatorElement = document.createElement("div");
                 separatorElement.className = "separator";
     
@@ -93,28 +123,28 @@ export class _UnplaybleRoom{
                 pieceElement.dataset.y = y;
                 pieceElement.addEventListener("click", ()=>this._onPieceClicked(pieceElement));
                 rowElement.appendChild(pieceElement);
-                if (x < 8) rowElement.appendChild(separatorElement);
+                if (y < 8) rowElement.appendChild(separatorElement);
     
-                row.push(new DrawablePiece(x, y, pieceElement));
+                row.push(pieceElement);
     
                 separatorElement = document.createElement("div");
                 separatorElement.className = "separator";
                 rowSeparatorElement.appendChild(separatorElement);
-                if (x < 8) rowSeparatorElement.appendChild(document.createElement("div"));
+                if (y < 8) rowSeparatorElement.appendChild(document.createElement("div"));
             }
             boardElement.appendChild(rowElement);
-            if (y < 8) {
+            if (x < 8) {
                 boardElement.appendChild(rowSeparatorElement);
             }
-            board.push(row);
+            pieceElements.push(row);
         }
     
-        return new Gothello(player1, player2, (x,y) => board[x][y]);
+        return pieceElements;
     }
     
     _onPieceClicked(e){
         let currentPlayer = null;
-        for (const player of this.operablePlayers) {if (this.gothello.isPlayerTurn(player)) currentPlayer = player;}
+        for (const player of this.operablePlayers) {if (this.board.isPlayerTurn(player)) currentPlayer = player;}
         if (currentPlayer) currentPlayer.placePiece(Number(e.dataset.x), Number(e.dataset.y));
     }
 }

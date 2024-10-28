@@ -1,40 +1,77 @@
 'use strict';
 
-export class Piece{
-    setState(state){
-        this._state = state;
-    }
-    
-    getState(){
-        return this._state;
-    }
+import { Player } from "./player";
 
-    constructor(x, y){
-        this.x = x;
-        this.y = y;
-        this._state = 0;
-    }
-}
+/**
+ * 駒の状態を表すEnumもどき
+ */
+const PieceState = Object.freeze({
+    Empty: 0,
+    Black: 1,
+    White: 2,
+    BlackSole: 3,
+    WhiteSole: 4,
 
-export class Gothello{
-    turn = 1;
-    board = [];
-    onPlacesPiece =(x, y)=>[];
-    onSettled = (player, message)=>{};
+    /** 
+     * 値から名前を返す
+     * 存在しない値の場合は空文字を返す
+     */
+    valueToName: (value)=>{
+        switch(value){
+            case 0: return "Empty";
+            case 1: return "Black";
+            case 2: return "White";
+            case 3: return "BlackSole";
+            case 4: return "WhiteSole";
+        }
+        return "";
+    },
+
+    /** 
+     * 名前から値を返す
+     * 存在しない名前の場合は-1を返す
+     */
+    nameToValue: (name)=>{
+        switch(name){
+            case "Empty": return 0;
+            case "Black": return 1;
+            case "White": return 2;
+            case "BlackSole": return 3;
+            case "WhiteSole": return 4;
+        }
+        return -1;
+    },
+})
+
+export class Board{
+    _turn = 1;
+    _board = [];
+    _onPlacesPiece = (x, y)=>[];
+    _onSettled = (player, message)=>{};
     _players = [];
     _turnPlayer = null;
     
-    constructor(player1, player2, pieceCreater = (x,y) => new Piece(x,y)){
+    /**
+     * 
+     * @param {Player} player1 
+     * @param {Player} player2 
+     * @param {(x: number, y: number) => {}} onPlacesPiece 
+     * @param {(player, message) => {}} onSettled 
+     */
+    constructor(player1, player2, onPlacesPiece = (x,y) => {}, onSettled = (player, message)=>{}){
         player1.gothello = this;
         this._turnPlayer = player1;
         player2.gothello = this;
         this._players = [player1, player2];
 
+        this._onPlacesPiece = onPlacesPiece;
+        this._onSettled = onSettled;
+
         for(let y = 0; y < 9; y++){
             const row = [];
             for(let x = 0; x < 9; x++)
-                row.push(pieceCreater(x,y));
-            this.board.push(row);
+                row.push(PieceState.Empty);
+            this._board.push(row);
         }
     }
 
@@ -54,6 +91,14 @@ export class Gothello{
         return playernum
     }
 
+    /**
+     * ボードの複製を返す
+     * @returns ボードのコピー
+     */
+    getBoard(){
+        return this._getBoardCopy();
+    }
+
     getTurnPlayer(){
         return this._turnPlayer;
     }
@@ -66,22 +111,27 @@ export class Gothello{
         this.isPlayerTurn(player);
         const playernum = this.getPlayerNum(player);
 
-        if (this.board[x] == undefined || this.board[x][y] == undefined)
+        if (this._board[x] == undefined || this._board[x][y] == undefined)
         throw new Error("入力エラー001 : 開発者に報告してください。");
 
-        const state = this.board[x][y].getState()
+        const state = this._board[x][y]
         const opponentnum = playernum == 1 ? 2 : 1;
         
         if (state >= 3) return;
         if (state == opponentnum) return;
         
-        if (state == playernum) this.board[x][y].setState(state + 2);
+        if (state == playernum) this._board[x][y] = state + 2;
         
-        if (state == 0) if (!this._placeNewPiece(playernum,x,y)) return;
+        if (state == 0) {
+            if (!this._placeNewPiece(playernum,x,y)) {
+                this._onPlacesPiece(x,y);
+                return;
+            }
+        }
         
         let canPlace = false;
-        for (let x = 0; x < this.board.length; x++) {
-            for (let y = 0; y < this.board[x].length; y++) {
+        for (let x = 0; x < this._board.length; x++) {
+            for (let y = 0; y < this._board[x].length; y++) {
                 if(this.canPlacePiece(this._players[opponentnum-1], x, y)){
                     canPlace = true;
                 }
@@ -94,30 +144,30 @@ export class Gothello{
 
         this._players[opponentnum-1].placedPiece(x, y);
         this._turnPlayer = this._players[opponentnum-1];
-        this.onPlacesPiece(x,y);
-        this.turn++;
+        this._onPlacesPiece(x,y);
+        this._turn++;
 
     }
 
     _placeNewPiece(playernum, x, y){
-        const board = this._getBoardInt();
+        const boardCopy = this._getBoardCopy();
         const opponentnum = playernum == 1 ? 2 : 1;
 
-        board[x][y] = playernum;
-        if(this.turn == 2)board[x][y] += 2;
+        boardCopy[x][y] = playernum;
+        if(this._turn == 2)boardCopy[x][y] += 2;
 
         let turnedOver = false;
         try {
-            turnedOver = this._turnOver(playernum, x, y, board);
+            turnedOver = this._turnOver(playernum, x, y, boardCopy);
         } catch {
             return false;
         }
 
-        let victory = this._isVictory(playernum, board);
+        let victory = this._isVictory(playernum, boardCopy);
 
         if(turnedOver && victory)return false;
         
-        this._reflectBoardInt(board);
+        this._board = boardCopy;
 
         if(victory){
             this._settled("");
@@ -129,7 +179,7 @@ export class Gothello{
     
     canPlacePiece(player, x, y){
         this.isPlayerTurn(player);
-        const board = this._getBoardInt();
+        const board = this._getBoardCopy();
         const playernum = this.getPlayerNum(player);
 
         if (board[x] == undefined || board[x][y] == undefined)
@@ -151,7 +201,7 @@ export class Gothello{
         const opponentnum = playernum == 1 ? 2 : 1;
 
         board[x][y] = playernum;
-        if(this.turn == 2)board[x][y] += 2;
+        if(this._turn == 2)board[x][y] += 2;
 
         let turnedOver = false;
         try {
@@ -239,29 +289,18 @@ export class Gothello{
         return false;
     }
 
-    _reflectBoardInt(board){
-        const boardBackup = this._getBoardInt();
-
-        for(let _x = 0; _x < this.board.length; _x++){
-            for(let _y = 0; _y < this.board.length; _y++){
-                if(board[_x][_y] != this.board[_x][_y].getState())
-                this.board[_x][_y].setState(board[_x][_y]);
-            }
-        }
-    }
-
     _settled(message){
-        this.onSettled(this._turnPlayer, message);
+        this._onSettled(this._turnPlayer, message);
         for (const player of this._players) {player.settled(this._turnPlayer);}
         this._turnPlayer = null;
     }
 
-    _getBoardInt(){
+    _getBoardCopy(){
         const board = []; 
-        for(let _x = 0; _x < this.board.length; _x++){
+        for(let _x = 0; _x < this._board.length; _x++){
             const row = [];
-            for(let _y = 0; _y < this.board.length; _y++)
-                row.push(this.board[_x][_y].getState());
+            for(let _y = 0; _y < this._board.length; _y++)
+                row.push(this._board[_x][_y]);
             board.push(row);
         }
         return board;
