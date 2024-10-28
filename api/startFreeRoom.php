@@ -46,7 +46,7 @@ function joinRoom($path, $room){
 
     $data["time"] = time();
     $data["playerCode"] = $playerCode;
-    file_put_contents($path . (string)$room . "/player_${playerNum}_state.json", json_encode($data));
+    file_put_contents($path . (string)$room . "/player_{$playerNum}_state.json", json_encode($data));
 
     return [$playerNum, $playerCode];
 }
