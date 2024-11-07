@@ -10,7 +10,7 @@ export class AIPlayer extends _UnplayblePlayer{
             if (this._board.getCurrentTurnColor() !== this._myColor) return;
             if (this._board.isSettled()) return;
             // ユーザエクスペリエンスのため
-            setTimeout(()=>this._placePieceInTheBestPlaces(), 100);
+            setTimeout(()=>this._placePieceInTheBestPlaces(), 500);
         });
     }
 
@@ -30,7 +30,7 @@ export class AIPlayer extends _UnplayblePlayer{
 
         const board = this._board.getBoardCopy();
         
-        let maxEval = -1000;
+        let maxEval = -9999;
         const places = [];
         
         for (let x = 0; x < board.length; x++) {
@@ -54,7 +54,7 @@ export class AIPlayer extends _UnplayblePlayer{
         }
 
         /* 詰んだら投了。しないほうがいい気がするのでコメントアウト。
-        if (maxEval == -1000){
+        if (maxEval <= -1000){
             this._conced();
             return;
         }
@@ -91,7 +91,7 @@ export class AIPlayer extends _UnplayblePlayer{
                 if(!this._board.placePieceSimulate(boardClone, playerColor, x, y)) continue;
 
                 if(this._board.isPieceFiveLinedUp(boardClone, x, y)){
-                    return isMe ? 1000 : -1000;
+                    return isMe ? 1000 : -1000 - depth;
                 }
                 
                 if (depth === 0){
@@ -144,8 +144,7 @@ export class AIPlayer extends _UnplayblePlayer{
     }
 
     /**
-     * 盤面をにおいて座標の周り2麻酔内に他の駒が存在しないかどうかを調べる
-     * 縦横斜めのみ調べる(桂馬的な座標は調べない)
+     * 座標の周り1マス以内に他の駒が存在しないかどうかを調べる
      * @param board ボードの2次元配列
      * @returns 
      */
