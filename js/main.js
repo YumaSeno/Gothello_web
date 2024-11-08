@@ -1,5 +1,5 @@
 'use strict';
-import { API } from "./apiCall.js"
+import { API } from "./common/apiCall.js"
 import { OfflineRoom, AIRoom, OnlineRoom, PrivateOnlineRoom, AIAIRoom } from "./room.js";
 
 //サーバー側に残っているルームを削除

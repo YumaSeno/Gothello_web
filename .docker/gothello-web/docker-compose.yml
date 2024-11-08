@@ -3,7 +3,7 @@ services:
     container_name: php_container
     image: php:8.3-apache
     volumes:
-      - '..:/var/www/html'
+      - '../..:/var/www/html'
     ports:
       - '8080:80'
     command:  >

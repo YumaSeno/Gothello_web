@@ -1,11 +1,11 @@
 'use strict';
-import { API } from "./apiCall.js"
-import { SettledReason } from "./board.js";
+import { API } from "./common/apiCall.js"
+import { SettledReason } from "./common/const.js";
 
 /**
  * プレイヤーのベースとなるクラス
  */
-export class _UnplayblePlayer{
+export class _PlayerInterface{
     _name = "";
     _board = null;
     _myColor = null;
@@ -13,7 +13,9 @@ export class _UnplayblePlayer{
     conceded(){}
     settled(){}
 
-    name = () => this._name;
+    get name () {
+        return this._name
+    };
 
     constructor(name, myColor, board){
         this._name = name;
@@ -22,8 +24,8 @@ export class _UnplayblePlayer{
     }
 }
 
-/**ローカルで操作可能なプレイヤー */
-export class LocalPlayer extends _UnplayblePlayer{
+/**ウェブアプリで操作可能なプレイヤー */
+export class WebAppControllablePlayer extends _PlayerInterface{
     constructor(name, myColor, board, pieceElements, cancelButtonElement){
         super(name, myColor, board);
         for(let _x = 0; _x < pieceElements.length; _x++){
@@ -57,7 +59,7 @@ export class LocalPlayer extends _UnplayblePlayer{
     }
 }
 
-export class DummyPlayer extends _UnplayblePlayer{
+export class DummyPlayer extends _PlayerInterface{
     constructor(name, myColor, board){
         super(name, myColor, board);
         setInterval(()=>{this._placePiece(Math.floor(Math.random() * 9), Math.floor(Math.random() * 9));}, 1000);
@@ -73,7 +75,7 @@ export class DummyPlayer extends _UnplayblePlayer{
     }
 }
 
-export class OnlinePlayer extends _UnplayblePlayer{
+export class OnlinePlayer extends _PlayerInterface{
     mode = null;
     roomCode = null;
     playerCode = null;
