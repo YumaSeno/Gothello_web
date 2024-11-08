@@ -1,0 +1,8 @@
+services:
+  gothello_web:
+    container_name: node_container
+    image: node:alpine
+    working_dir: /usr/src/app
+    volumes:
+      - '../..:/usr/src/app'
+    command: node 
