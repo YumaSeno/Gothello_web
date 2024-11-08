@@ -1,7 +1,7 @@
 'use strict';
-import { _UnplayblePlayer } from "./player.js"
+import { _PlayerInterface } from "./player.js"
 
-export class AIPlayer extends _UnplayblePlayer{
+export class AIPlayer extends _PlayerInterface{
     constructor(name, myColor, board){
         super(name, myColor, board);
         setTimeout(()=>this._placePiece(4,4), 500);

@@ -1,6 +1,7 @@
-import { API } from "./apiCall.js"
-import { Board, PieceColor, PieceState, SettledReason } from "./board.js";
-import { DummyPlayer, LocalPlayer, OnlinePlayer } from "./player.js";
+import { API } from "./common/apiCall.js"
+import { PieceColor, PieceState } from "./common/const.js";
+import { Board } from "./board.js";
+import { DummyPlayer, WebAppControllablePlayer, OnlinePlayer } from "./player.js";
 import { AIPlayer } from "./aiPlayer.js";
 
 const OPERATION_ELEMENT = {
@@ -43,7 +44,7 @@ export class _UnplaybleRoom{
     /**駒のDOMをボードと同様に2次元配列に詰めたもの。上の_boardElementの下に同じDOMが入っているが、便宜上定義している。 */
     _pieceElements = null;
 
-    _onSettled = (winner, settledReason) => OPERATION_ELEMENT.onSettled(`${winner.name()} Win!`)
+    _onSettled = (winner, settledReason) => OPERATION_ELEMENT.onSettled(`${winner.name} Win!`)
 
     /**
      * ボードオブジェクトと盤面を表すDOMの生成が行われる。
@@ -58,7 +59,7 @@ export class _UnplaybleRoom{
 
         document.body.replaceChild(this._boardElement, document.getElementById("board"));
         OPERATION_ELEMENT.readyElement();
-        OPERATION_ELEMENT.changeName(player1.name(), "black");
+        OPERATION_ELEMENT.changeName(player1.name, "black");
     }
 
     _boardInitialize(){
@@ -66,7 +67,7 @@ export class _UnplaybleRoom{
         const board = new Board();
         board.addEventListnerOnPlacesPiece((x, y) => {
             if(!this._board.isSettled()){
-                OPERATION_ELEMENT.changeName(this._players[this._board.getCurrentTurnColor()].name(), PieceColor.valueToName(this._board.getCurrentTurnColor()).toLowerCase());
+                OPERATION_ELEMENT.changeName(this._players[this._board.getCurrentTurnColor()].name, PieceColor.valueToName(this._board.getCurrentTurnColor()).toLowerCase());
             }
 
             const board = this._board.getBoardCopy();
@@ -144,8 +145,8 @@ export class _UnplaybleRoom{
 export class OfflineRoom extends _UnplaybleRoom {
     start(){
         super._startGame(
-            new LocalPlayer("player1", PieceColor.Black, this._board, this._pieceElements, document.getElementById("cancel_button")),
-            new LocalPlayer("player2", PieceColor.White, this._board, this._pieceElements, document.getElementById("cancel_button"))
+            new WebAppControllablePlayer("player1", PieceColor.Black, this._board, this._pieceElements, document.getElementById("cancel_button")),
+            new WebAppControllablePlayer("player2", PieceColor.White, this._board, this._pieceElements, document.getElementById("cancel_button"))
         );
     }
 }
@@ -154,12 +155,12 @@ export class RundomAIRoom extends _UnplaybleRoom {
     start(){
         const playerNum = Math.floor(Math.random() * 2);
         const players = [
-            new LocalPlayer("あなた", playerNum + 1, this._board, this._pieceElements, document.getElementById("cancel_button")),
+            new WebAppControllablePlayer("あなた", playerNum + 1, this._board, this._pieceElements, document.getElementById("cancel_button")),
             new DummyPlayer(" AI ", ((playerNum + 1) % 2) + 1, this._board)
         ];
         const player1 = players[playerNum];
         const player2 = players[(playerNum + 1) % 2];
-        this._onSettled = (winner) => OPERATION_ELEMENT.onSettled(`You ${winner.name() == "あなた" ? "Win!" : "Lose..."}`);
+        this._onSettled = (winner) => OPERATION_ELEMENT.onSettled(`You ${winner.name == "あなた" ? "Win!" : "Lose..."}`);
         super._startGame(
             player1,
             player2,
@@ -171,12 +172,12 @@ export class AIRoom extends _UnplaybleRoom {
     start(){
         const playerNum = Math.floor(Math.random() * 2);
         const players = [
-            new LocalPlayer("あなた", playerNum + 1, this._board, this._pieceElements, document.getElementById("cancel_button")),
+            new WebAppControllablePlayer("あなた", playerNum + 1, this._board, this._pieceElements, document.getElementById("cancel_button")),
             new AIPlayer(" AI ", ((playerNum + 1) % 2) + 1, this._board)
         ];
         const player1 = players[playerNum];
         const player2 = players[(playerNum + 1) % 2];
-        this._onSettled = (winner) => OPERATION_ELEMENT.onSettled(`You ${winner.name() == "あなた" ? "Win!" : "Lose..."}`);
+        this._onSettled = (winner) => OPERATION_ELEMENT.onSettled(`You ${winner.name == "あなた" ? "Win!" : "Lose..."}`);
         super._startGame(
             player1,
             player2,
@@ -255,12 +256,12 @@ export class OnlineRoom extends _UnplaybleRoom {
     _start(){
         document.getElementById("cancel_button").removeEventListener("click", this.stopMatching);
         const players = [
-            new LocalPlayer("あなた", this.playerNum, this._board, this._pieceElements, document.getElementById("cancel_button")),
+            new WebAppControllablePlayer("あなた", this.playerNum, this._board, this._pieceElements, document.getElementById("cancel_button")),
             new OnlinePlayer("相手", (this.playerNum % 2) + 1, this._board, "free", this.roomCode, this.playerCode)
         ];
         const player1 = players[this.playerNum - 1];
         const player2 = players[this.playerNum % 2];
-        this._onSettled = (winner) => OPERATION_ELEMENT.onSettled(`You ${winner.name() == "あなた" ? "Win!" : "Lose..."}`);
+        this._onSettled = (winner) => OPERATION_ELEMENT.onSettled(`You ${winner.name == "あなた" ? "Win!" : "Lose..."}`);
         super._startGame(
             player1,
             player2,
@@ -343,12 +344,12 @@ export class PrivateOnlineRoom extends _UnplaybleRoom {
     _start(){
         document.getElementById("cancel_button").removeEventListener("click", this.stopMatching);
         const players = [
-            new LocalPlayer("あなた", this.playerNum, this._board, this._pieceElements, document.getElementById("cancel_button")),
+            new WebAppControllablePlayer("あなた", this.playerNum, this._board, this._pieceElements, document.getElementById("cancel_button")),
             new OnlinePlayer("相手", (this.playerNum % 2) + 1, this._board, "private", this.roomCode, this.playerCode)
         ];
         const player1 = players[this.playerNum - 1];
         const player2 = players[this.playerNum % 2];
-        this._onSettled = (winner) => OPERATION_ELEMENT.onSettled(`You ${winner.name() == "あなた" ? "Win!" : "Lose..."}`);
+        this._onSettled = (winner) => OPERATION_ELEMENT.onSettled(`You ${winner.name == "あなた" ? "Win!" : "Lose..."}`);
         super._startGame(
             player1,
             player2,
