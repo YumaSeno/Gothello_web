@@ -1,8 +1,8 @@
 services:
-  gothello_web:
-    container_name: node_container
+  gothello_cli:
+    container_name: gothello_cli
     image: node:alpine
-    working_dir: /usr/src/app
+    working_dir: /usr/src/app/cli
     volumes:
-      - '../..:/usr/src/app'
-    command: node 
+      - '../../src:/usr/src/app'
+    tty: true
