@@ -132,11 +132,11 @@ export class AIPlayer extends _PlayerInterface{
         
         for (let x = 0; x < board.length; x++) {
             for (let y = 0; y < board[x].length; y++) {
-                const num = ((board[x][y] - 1) % 2) + 1;
-                if(num === playerColor){
+                const pieceColor = PieceColor.byPieceState(board[x][y]);
+                if(pieceColor === playerColor){
                     evalNum++;
                     if(x == 4 && y == 4) evalNum += 0.5;
-                }else if(num === opponentColor){
+                }else if(pieceColor === opponentColor){
                     evalNum--;
                     if(x == 4 && y == 4) evalNum -= 0.5;
                 }

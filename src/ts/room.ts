@@ -4,6 +4,7 @@ import { PieceColor, PieceState, SettledReason } from "./common/const";
 import { Board } from "./board";
 import { _PlayerInterface, DummyPlayer, WebAppControllablePlayer, OnlinePlayer } from "./player";
 import { AIPlayer } from "./aiPlayer";
+import { AIPlayerDeepQLearning } from "./aiPlayerDeepQLearning/aiPlayerDeepQLearning";
 
 const OPERATION_ELEMENT = {
     readyElement(){
@@ -32,7 +33,7 @@ const OPERATION_ELEMENT = {
     },
 }
 
-export class _UnplaybleRoom{
+export class _AbstractRoom{
     /**プレイヤーのインスタンスがPieceColorをキーにして詰められる */
     _players: _PlayerInterface[] = [];
 
@@ -143,7 +144,7 @@ export class _UnplaybleRoom{
     }
 }
 
-export class OfflineRoom extends _UnplaybleRoom {
+export class OfflineRoom extends _AbstractRoom {
     start(){
         super._startGame(
             new WebAppControllablePlayer("player1", PieceColor.Black, this._board!, this._pieceElements!, document.getElementById("cancel_button")!),
@@ -152,7 +153,7 @@ export class OfflineRoom extends _UnplaybleRoom {
     }
 }
 
-export class RundomAIRoom extends _UnplaybleRoom {
+export class RundomAIRoom extends _AbstractRoom {
     start(){
         const playerNum = Math.floor(Math.random() * 2);
         const players = [
@@ -169,7 +170,7 @@ export class RundomAIRoom extends _UnplaybleRoom {
     }
 }
 
-export class AIRoom extends _UnplaybleRoom {
+export class AIRoom extends _AbstractRoom {
     start(){
         const playerNum = Math.floor(Math.random() * 2);
         const players = [
@@ -186,7 +187,7 @@ export class AIRoom extends _UnplaybleRoom {
     }
 }
 
-export class AIAIRoom extends _UnplaybleRoom {
+export class AIAIRoom extends _AbstractRoom {
     start(){
         super._startGame(
             new AIPlayer(" AI1 ", PieceColor.Black, this._board!),
@@ -195,7 +196,39 @@ export class AIAIRoom extends _UnplaybleRoom {
     }
 }
 
-export class OnlineRoom extends _UnplaybleRoom {
+export class DeepQLearningAIRoom extends _AbstractRoom {
+    start(){
+        const playerNum = Math.floor(Math.random() * 2);
+        const aiPlayer = new AIPlayerDeepQLearning(" AI ", ((playerNum + 1) % 2) + 1, this._board!);
+        aiPlayer.loadModel("../dqn-model");
+        const players = [
+            new WebAppControllablePlayer("あなた", playerNum + 1, this._board!, this._pieceElements!, document.getElementById("cancel_button")!),
+            aiPlayer
+        ];
+        const player1 = players[playerNum];
+        const player2 = players[(playerNum + 1) % 2];
+        this._onSettled = (winner) => OPERATION_ELEMENT.onSettled(`You ${winner.name == "あなた" ? "Win!" : "Lose..."}`);
+        super._startGame(
+            player1,
+            player2,
+        );
+    }
+}
+
+export class DeepQLearningAIAIRoom extends _AbstractRoom {
+    start(){
+        const aiPlayer1 = new AIPlayerDeepQLearning(" AI1 ", PieceColor.Black, this._board!);
+        aiPlayer1.loadModel("../dqn-model");
+        const aiPlayer2 = new AIPlayerDeepQLearning(" AI2 ", PieceColor.White, this._board!);
+        aiPlayer1.loadModel("../dqn-model");
+        super._startGame(
+            aiPlayer1,
+            aiPlayer2,
+        );
+    }
+}
+
+export class OnlineRoom extends _AbstractRoom {
     roomCode: string | null = null;
     playerNum: PieceColor | null = null;
     playerCode: string | null = null;
@@ -270,7 +303,7 @@ export class OnlineRoom extends _UnplaybleRoom {
     }
 }
 
-export class PrivateOnlineRoom extends _UnplaybleRoom {
+export class PrivateOnlineRoom extends _AbstractRoom {
     roomCode: string | null = null;
     playerNum: PieceColor | null = null;
     playerCode: string | null = null;

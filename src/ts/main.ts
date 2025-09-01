@@ -1,7 +1,7 @@
 
 'use strict';
 import { API } from "./common/apiCall"
-import { OfflineRoom, AIRoom, OnlineRoom, PrivateOnlineRoom, AIAIRoom } from "./room";
+import { OfflineRoom, AIRoom, OnlineRoom, PrivateOnlineRoom, AIAIRoom, DeepQLearningAIAIRoom, DeepQLearningAIRoom } from "./room";
 
 //サーバー側に残っているルームを削除
 API.call("checkDisconnectedRoom");
@@ -24,6 +24,16 @@ function selectMode(element: HTMLElement){
 
     if(element.id == "aiai_mode"){
         const room = new AIAIRoom();
+        room.start();
+    }
+
+    if(element.id == "ai_dq_mode"){
+        const room = new DeepQLearningAIRoom();
+        room.start();
+    }
+
+    if(element.id == "aiai_dq_mode"){
+        const room = new DeepQLearningAIAIRoom();
         room.start();
     }
     

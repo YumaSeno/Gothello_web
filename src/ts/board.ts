@@ -140,10 +140,10 @@ export class Board{
     canPlacePiece(board: PieceState[][], pieceColor: PieceColor, x: number, y: number): boolean{
         const opponentcolor = this.getOpponentColor(pieceColor);
         
-        if (board[x][y] >= 3) return false;
-        if (board[x][y] == (opponentcolor as number)) return false;
+        if (PieceState.isSole(board[x][y])) return false;
+        if (PieceColor.byPieceState(board[x][y]) == opponentcolor) return false;
         
-        if (board[x][y] == (pieceColor as number)) return true;
+        if (PieceColor.byPieceState(board[x][y]) == pieceColor) return true;
         
         if (board[x][y] == PieceState.Empty) return this.canPlaceNewPiece(board, pieceColor, x, y);
 
@@ -194,7 +194,7 @@ export class Board{
 
         const state = boardCopy[x][y];
         
-        if (state == (pieceColor as number)){
+        if (PieceColor.byPieceState(state) == pieceColor){
             boardCopy[x][y] = state + 2;
         } else if(!this.canPlacePiece(boardCopy, pieceColor, x, y)) {
             return false;
@@ -246,7 +246,7 @@ export class Board{
 
         const state = board[x][y];
         
-        if (state == (pieceColor as number)){
+        if (PieceColor.byPieceState(state) == pieceColor){
             board[x][y] = state + 2;
         } else if(!this.canPlacePiece(board, pieceColor, x, y)) {
             return false;
@@ -309,7 +309,7 @@ export class Board{
     isColorFiveLinedUp(board: PieceState[][], pieceColor: PieceColor): boolean{
         for (let x = 0; x < board.length; x++) {
             for (let y = 0; y < board[x].length; y++) {
-                if (((board[x][y]-1) % 2) + 1 != pieceColor) continue;
+                if (PieceColor.byPieceState(board[x][y]) != pieceColor) continue;
                 if (this.isPieceFiveLinedUp(board, x, y)) return true;
             }
         }
@@ -323,7 +323,8 @@ export class Board{
      * @returns 
      */
     isPieceFiveLinedUp(board: PieceState[][], x: number, y: number): boolean{
-        const pieceColor = board[x][y];
+        const pieceColor = PieceColor.byPieceState(board[x][y]);
+        if (pieceColor === null) return false;
         const directions = [
             [1, 0],  // ー
             [1, 1],  // ＼
@@ -339,7 +340,7 @@ export class Board{
             // 正方向のカウント
             let _x = x + dire_x;
             let _y = y + dire_y;
-            while((_x >= 0 && _y >= 0 && _x < board[0].length && _y < board.length) && (((board[_x][_y]-1) % 2) + 1 == pieceColor)){
+            while((_x >= 0 && _y >= 0 && _x < board[0].length && _y < board.length) && (PieceColor.byPieceState(board[_x][_y]) == pieceColor)){
                 count++;
                 if(count >= 5) return true;
                 _x += dire_x;
@@ -349,7 +350,7 @@ export class Board{
             // 負方向のカウント
             _x = x - dire_x;
             _y = y - dire_y;
-            while((_x >= 0 && _y >= 0 && _x < board[0].length && _y < board.length) && (((board[_x][_y]-1) % 2) + 1 == pieceColor)){
+            while((_x >= 0 && _y >= 0 && _x < board[0].length && _y < board.length) && (PieceColor.byPieceState(board[_x][_y]) == pieceColor)){
                 count++;
                 if(count >= 5) return true;
                 _x -= dire_x;
@@ -375,8 +376,8 @@ export class Board{
                 while(_x >= 0 && _y >= 0 && _x < board[0].length && _y < board.length){
                     if (board[_x][_y] == 0){break;}
 
-                    if (board[_x][_y] == opponentcolor + 2){haveSole = true;}
-                    if ((board[_x][_y] - 1) % 2 + 1 == pieceColor){
+                    if (PieceState.isSole(board[_x][_y])){haveSole = true;}
+                    if (PieceColor.byPieceState(board[_x][_y]) == pieceColor){
                         if (haveSole) return null;
                         isTurnOver = true;
                         break;
