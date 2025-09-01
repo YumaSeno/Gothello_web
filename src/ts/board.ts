@@ -1,36 +1,37 @@
+
 'use strict';
 
-import { PieceColor, PieceState, SettledReason } from "./common/const.js";
+import { PieceColor, PieceState, SettledReason } from "./common/const";
 
 /**
  * ルールを制御する盤面を表すクラス
  */
 export class Board{
     /**現在のターン数 */
-    _turn = 1;
+    _turn: number = 1;
 
     /**現在のターンで置かれる駒の色 */
-    _currentTurnColor = PieceColor.Black;
+    _currentTurnColor: PieceColor = PieceColor.Black;
 
     /**盤面を表す2次元配列 */
-    _board = [];
+    _board: PieceState[][] = [];
 
     /**対局が終了したかどうか */
-    _isSettled = false;
+    _isSettled: boolean = false;
 
     /**駒が置かれた際のイベントハンドラー */
-    _onPlacesPiece = [];
+    _onPlacesPiece: ((x: number, y: number) => void)[] = [];
 
     /**対局が終了したときのイベントハンドラー */
-    _onSettled = [];
+    _onSettled: ((winnerPieceColor: PieceColor, message: SettledReason) => void)[] = [];
 
     /**棋譜 */
-    _gameRecord = [];
+    _gameRecord: {x: number, y: number}[] = [];
     
     /**コンストラクタ */
     constructor(){
         for(let y = 0; y < 9; y++){
-            const row = [];
+            const row: PieceState[] = [];
             for(let x = 0; x < 9; x++)
                 row.push(PieceState.Empty);
             this._board.push(row);
@@ -41,7 +42,7 @@ export class Board{
      * 駒が置かれた際のイベントリスナーを追加する
      * @param {(x, y) => {}} lister
      */
-    addEventListnerOnPlacesPiece(lister) {
+    addEventListnerOnPlacesPiece(lister: (x: number, y: number) => void) {
         this._onPlacesPiece.push(lister);
     }
 
@@ -49,7 +50,7 @@ export class Board{
      * 駒が置かれた際のイベントリスナーを削除する
      * @param {(x, y) => {}} lister
      */
-    removeEventListnerOnPlacesPiece(lister) {
+    removeEventListnerOnPlacesPiece(lister: (x: number, y: number) => void) {
         this._onPlacesPiece = this._onPlacesPiece.filter((item) => item === lister);
     }
 
@@ -57,7 +58,7 @@ export class Board{
      * 対局が終了した際のイベントリスナーを追加する
      * @param {(winnerPieceColor, message) => {}} lister
      */
-    addEventListnerOnSettled(lister) {
+    addEventListnerOnSettled(lister: (winnerPieceColor: PieceColor, message: SettledReason) => void) {
         this._onSettled.push(lister);
     }
 
@@ -65,7 +66,7 @@ export class Board{
      * 対局が終了した際のイベントリスナーを削除する
      * @param {(winnerPieceColor, message) => {}} lister
      */
-    removeEventListnerOnSettled(lister) {
+    removeEventListnerOnSettled(lister: (winnerPieceColor: PieceColor, message: SettledReason) => void) {
         this._onSettled = this._onSettled.filter((item) => item === lister);
     }
 
@@ -73,7 +74,7 @@ export class Board{
      * 対局が完了したかどうかを確認する
      * @returns 対局が完了したかどうか
      */
-    isSettled(){
+    isSettled(): boolean{
         return this._isSettled;
     }
 
@@ -81,7 +82,7 @@ export class Board{
      * 現在のターンで置く駒の色を取得
      * @returns 現在のターンで置く駒の色
      */
-    getCurrentTurnColor(){
+    getCurrentTurnColor(): PieceColor{
         return this._currentTurnColor;
     }
 
@@ -90,7 +91,7 @@ export class Board{
      * @param {number} pieceColor 
      * @returns 引数で渡された駒の色の敵の駒の色
      */
-    getOpponentColor(pieceColor){
+    getOpponentColor(pieceColor: PieceColor): PieceColor{
         return pieceColor == PieceColor.Black ? PieceColor.White : PieceColor.Black;
     }
 
@@ -98,7 +99,7 @@ export class Board{
      * 現在のボードの複製を返す
      * @returns ボードのコピー
      */
-    getBoardCopy(){
+    getBoardCopy(): PieceState[][]{
         return this.getBoardClone(this._board);
     }
 
@@ -106,10 +107,10 @@ export class Board{
      * 渡されたボードの複製を返す
      * @returns ボードの複製
      */
-    getBoardClone(board){
-        const boardClone = []; 
+    getBoardClone(board: PieceState[][]): PieceState[][]{
+        const boardClone: PieceState[][] = []; 
         for(let _x = 0; _x < board.length; _x++){
-            const row = [];
+            const row: PieceState[] = [];
             for(let _y = 0; _y < board[_x].length; _y++)
                 row.push(board[_x][_y]);
             boardClone.push(row);
@@ -122,7 +123,7 @@ export class Board{
      * @param {number} pieceColor 
      * @returns 投了できたかどうか
      */
-    conced(pieceColor){
+    conced(pieceColor: PieceColor): boolean{
         if(pieceColor != this._currentTurnColor) return false;
         this._settled(this.getOpponentColor(pieceColor), SettledReason.Conced);
         return true;
@@ -136,13 +137,13 @@ export class Board{
      * @param {number} y 駒を置く場所のY位置
      * @returns 
      */
-    canPlacePiece(board, pieceColor, x, y){
+    canPlacePiece(board: PieceState[][], pieceColor: PieceColor, x: number, y: number): boolean{
         const opponentcolor = this.getOpponentColor(pieceColor);
         
-        if (board[x][y] >= 3) return false;
-        if (board[x][y] == opponentcolor) return false;
+        if (PieceState.isSole(board[x][y])) return false;
+        if (PieceColor.byPieceState(board[x][y]) == opponentcolor) return false;
         
-        if (board[x][y] == pieceColor) return true;
+        if (PieceColor.byPieceState(board[x][y]) == pieceColor) return true;
         
         if (board[x][y] == PieceState.Empty) return this.canPlaceNewPiece(board, pieceColor, x, y);
 
@@ -157,11 +158,11 @@ export class Board{
      * @param {number} y 駒を置く場所のY位置
      * @returns 
      */
-    canPlaceNewPiece(board, pieceColor, x, y){
+    canPlaceNewPiece(board: PieceState[][], pieceColor: PieceColor, x: number, y: number): boolean{
         const boardClone = this.getBoardClone(board);
         if (boardClone[x][y] !== PieceState.Empty) return false;
 
-        boardClone[x][y] = pieceColor;
+        boardClone[x][y] = pieceColor as unknown as PieceState;
 
         const turnOverdPieces = this._turnOver(boardClone, pieceColor, x, y);
         if (turnOverdPieces == null) return false;
@@ -185,7 +186,7 @@ export class Board{
      * @param {number} y 駒を置く場所のY位置
      * @returns 駒を置けたかどうか
      */
-    placePiece(pieceColor, x, y){
+    placePiece(pieceColor: PieceColor, x: number, y: number): boolean{
         if (pieceColor !== this._currentTurnColor) return false;
         if (this._isSettled) return false;
         const boardCopy = this.getBoardCopy();
@@ -193,14 +194,14 @@ export class Board{
 
         const state = boardCopy[x][y];
         
-        if (state == pieceColor){
+        if (PieceColor.byPieceState(state) == pieceColor){
             boardCopy[x][y] = state + 2;
         } else if(!this.canPlacePiece(boardCopy, pieceColor, x, y)) {
             return false;
         }
         
         if (state == 0) {
-            boardCopy[x][y] = pieceColor;
+            boardCopy[x][y] = pieceColor as unknown as PieceState;
             
             // 盤面に駒が黒一つだけならおいた駒をソルにする
             let sum = 0;
@@ -240,19 +241,19 @@ export class Board{
      * @param {number} y 駒を置く場所のY位置
      * @returns 駒を置けたかどうか
      */
-    placePieceSimulate(board, pieceColor, x, y){
+    placePieceSimulate(board: PieceState[][], pieceColor: PieceColor, x: number, y: number): boolean{
         const opponentcolor = this.getOpponentColor(pieceColor);
 
         const state = board[x][y];
         
-        if (state == pieceColor){
+        if (PieceColor.byPieceState(state) == pieceColor){
             board[x][y] = state + 2;
         } else if(!this.canPlacePiece(board, pieceColor, x, y)) {
             return false;
         }
         
         if (state == 0) {
-            board[x][y] = pieceColor;
+            board[x][y] = pieceColor as unknown as PieceState;
             
             // 盤面に駒が黒一つだけならおいた駒をソルにする
             let sum = 0;
@@ -275,7 +276,7 @@ export class Board{
      * @param pieceColor 判定する駒の色
      * @returns 決着理由のSettledReason。勝利していない場合はnull
      */
-    isVictory(board, pieceColor){
+    isVictory(board: PieceState[][], pieceColor: PieceColor): SettledReason | null{
         const opponentcolor = this.getOpponentColor(pieceColor);
 
         let whereToPlaceIsGone = false;
@@ -305,10 +306,10 @@ export class Board{
      * @param pieceColor 判定する駒の色
      * @returns 
      */
-    isColorFiveLinedUp(board, pieceColor){
+    isColorFiveLinedUp(board: PieceState[][], pieceColor: PieceColor): boolean{
         for (let x = 0; x < board.length; x++) {
             for (let y = 0; y < board[x].length; y++) {
-                if (((board[x][y]-1) % 2) + 1 != pieceColor) continue;
+                if (PieceColor.byPieceState(board[x][y]) != pieceColor) continue;
                 if (this.isPieceFiveLinedUp(board, x, y)) return true;
             }
         }
@@ -321,8 +322,9 @@ export class Board{
      * @param pieceColor 判定する駒の色
      * @returns 
      */
-    isPieceFiveLinedUp(board, x, y){
-        const pieceColor = board[x][y];
+    isPieceFiveLinedUp(board: PieceState[][], x: number, y: number): boolean{
+        const pieceColor = PieceColor.byPieceState(board[x][y]);
+        if (pieceColor === null) return false;
         const directions = [
             [1, 0],  // ー
             [1, 1],  // ＼
@@ -338,7 +340,7 @@ export class Board{
             // 正方向のカウント
             let _x = x + dire_x;
             let _y = y + dire_y;
-            while((_x >= 0 && _y >= 0 && _x < board[0].length && _y < board.length) && (((board[_x][_y]-1) % 2) + 1 == pieceColor)){
+            while((_x >= 0 && _y >= 0 && _x < board[0].length && _y < board.length) && (PieceColor.byPieceState(board[_x][_y]) == pieceColor)){
                 count++;
                 if(count >= 5) return true;
                 _x += dire_x;
@@ -348,7 +350,7 @@ export class Board{
             // 負方向のカウント
             _x = x - dire_x;
             _y = y - dire_y;
-            while((_x >= 0 && _y >= 0 && _x < board[0].length && _y < board.length) && (((board[_x][_y]-1) % 2) + 1 == pieceColor)){
+            while((_x >= 0 && _y >= 0 && _x < board[0].length && _y < board.length) && (PieceColor.byPieceState(board[_x][_y]) == pieceColor)){
                 count++;
                 if(count >= 5) return true;
                 _x -= dire_x;
@@ -358,14 +360,14 @@ export class Board{
         return false;
     }
 
-    _turnOver(board, pieceColor, x, y){
-        const turnOverdPieces = [];
+    _turnOver(board: PieceState[][], pieceColor: PieceColor, x: number, y: number): {x: number, y: number}[] | null{
+        const turnOverdPieces: {x: number, y: number}[] = [];
         const opponentcolor = this.getOpponentColor(pieceColor);
         const directions = [0,1,-1];
         for (const dire_y of directions) {
             for (const dire_x of directions) {
                 if(dire_y == 0 && dire_x == 0) continue;
-                const stack = [];
+                const stack: {x: number, y: number}[] = [];
 
                 let isTurnOver = false;
                 let _x = x + dire_x;
@@ -374,8 +376,8 @@ export class Board{
                 while(_x >= 0 && _y >= 0 && _x < board[0].length && _y < board.length){
                     if (board[_x][_y] == 0){break;}
 
-                    if (board[_x][_y] == opponentcolor + 2){haveSole = true;}
-                    if ((board[_x][_y] - 1) % 2 + 1 == pieceColor){
+                    if (PieceState.isSole(board[_x][_y])){haveSole = true;}
+                    if (PieceColor.byPieceState(board[_x][_y]) == pieceColor){
                         if (haveSole) return null;
                         isTurnOver = true;
                         break;
@@ -387,8 +389,8 @@ export class Board{
                 }
                 if(!isTurnOver)continue;
                 while(stack.length > 0){
-                    let xy = stack.pop();
-                    board[xy.x][xy.y] = pieceColor;
+                    let xy = stack.pop()!;
+                    board[xy.x][xy.y] = pieceColor as unknown as PieceState;
                     turnOverdPieces.push(xy);
                 }
             }
@@ -397,7 +399,7 @@ export class Board{
         return turnOverdPieces;
     }
 
-    _settled(winnerPieceColor, settledReason){
+    _settled(winnerPieceColor: PieceColor, settledReason: SettledReason){
         this._isSettled = true;
         for (const onSettled of this._onSettled) {
             onSettled(winnerPieceColor, settledReason);

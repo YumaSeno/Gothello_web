@@ -1,15 +1,17 @@
+
 'use strict';
-import { API } from "./common/apiCall.js"
-import { SettledReason } from "./common/const.js";
+import { API } from "./common/apiCall"
+import { PieceColor, SettledReason } from "./common/const";
+import { Board } from "./board";
 
 /**
  * プレイヤーのベースとなるクラス
  */
 export class _PlayerInterface{
-    _name = "";
-    _board = null;
-    _myColor = null;
-    placedPiece(x, y){}
+    _name: string = "";
+    _board: Board | null = null;
+    _myColor: PieceColor | null = null;
+    placedPiece(x: number, y: number){}
     conceded(){}
     settled(){}
 
@@ -17,7 +19,7 @@ export class _PlayerInterface{
         return this._name
     };
 
-    constructor(name, myColor, board){
+    constructor(name: string, myColor: PieceColor, board: Board){
         this._name = name;
         this._myColor = myColor;
         this._board = board;
@@ -26,7 +28,7 @@ export class _PlayerInterface{
 
 /**ウェブアプリで操作可能なプレイヤー */
 export class WebAppControllablePlayer extends _PlayerInterface{
-    constructor(name, myColor, board, pieceElements, cancelButtonElement){
+    constructor(name: string, myColor: PieceColor, board: Board, pieceElements: HTMLElement[][], cancelButtonElement: HTMLElement){
         super(name, myColor, board);
         for(let _x = 0; _x < pieceElements.length; _x++){
             const row = [];
@@ -37,7 +39,7 @@ export class WebAppControllablePlayer extends _PlayerInterface{
 
         let _removeButtonConcedEvent = () => {};
         const _conced = ()=>{
-            if (this._board.getCurrentTurnColor() == this._myColor) this._board.conced(this._myColor);
+            if (this._board!.getCurrentTurnColor() == this._myColor) this._board!.conced(this._myColor!);
             _removeButtonConcedEvent();
         }
         _removeButtonConcedEvent = ()=>cancelButtonElement.removeEventListener("click", _conced);
@@ -45,7 +47,7 @@ export class WebAppControllablePlayer extends _PlayerInterface{
         board.addEventListnerOnSettled((winnerPieceColor, message) => _removeButtonConcedEvent());
     }
     
-    _onPieceClicked(e){
+    _onPieceClicked(e: HTMLElement){
         this._placePiece(Number(e.dataset.x), Number(e.dataset.y));
     }
 
@@ -54,13 +56,13 @@ export class WebAppControllablePlayer extends _PlayerInterface{
      * @param {number} x 駒を置く場所のX位置
      * @param {number} y 駒を置く場所のY位置
      */
-    _placePiece(x, y){
-        if (this._board.getCurrentTurnColor() == this._myColor) this._board.placePiece(this._myColor, x, y);
+    _placePiece(x: number, y: number){
+        if (this._board!.getCurrentTurnColor() == this._myColor) this._board!.placePiece(this._myColor!, x, y);
     }
 }
 
 export class DummyPlayer extends _PlayerInterface{
-    constructor(name, myColor, board){
+    constructor(name: string, myColor: PieceColor, board: Board){
         super(name, myColor, board);
         setInterval(()=>{this._placePiece(Math.floor(Math.random() * 9), Math.floor(Math.random() * 9));}, 1000);
     }
@@ -70,25 +72,25 @@ export class DummyPlayer extends _PlayerInterface{
      * @param {number} x 駒を置く場所のX位置
      * @param {number} y 駒を置く場所のY位置
      */
-    _placePiece(x, y){
-        if (this._board.getCurrentTurnColor() == this._myColor) this._board.placePiece(this._myColor, x, y);
+    _placePiece(x: number, y: number){
+        if (this._board!.getCurrentTurnColor() == this._myColor) this._board!.placePiece(this._myColor!, x, y);
     }
 }
 
 export class OnlinePlayer extends _PlayerInterface{
-    mode = null;
-    roomCode = null;
-    playerCode = null;
-    isSettled = false;
+    mode: string | null = null;
+    roomCode: string | null = null;
+    playerCode: string | null = null;
+    isSettled: boolean = false;
 
-    constructor(name, myColor, board, mode, roomCode, playerCode){
+    constructor(name: string, myColor: PieceColor, board: Board, mode: string, roomCode: string, playerCode: string){
         super(name, myColor, board);
         this.mode = mode;
         this.roomCode = roomCode;
         this.playerCode = playerCode;
 
         board.addEventListnerOnPlacesPiece((x, y) => {
-            if (this._board.getCurrentTurnColor() !== this._myColor) return;
+            if (this._board!.getCurrentTurnColor() !== this._myColor) return;
             API.call("setLatestMove", {
                 mode: this.mode,
                 roomCode: this.roomCode,
@@ -116,7 +118,7 @@ export class OnlinePlayer extends _PlayerInterface{
                 mode: this.mode,
                 roomCode: this.roomCode,
                 playerCode: this.playerCode
-            },(response)=>{
+            },(response: any)=>{
                 if(response.moveType == "placePiece") this._placePiece(response.x, response.y);
                 if(response.moveType == "conced") this._conced();
                 if(!this.isSettled)setTimeout(_checkOpponentMove, 1500);
@@ -126,11 +128,11 @@ export class OnlinePlayer extends _PlayerInterface{
     }
 
 
-    _placePiece(x, y){
-        if (this._board.getCurrentTurnColor() == this._myColor) this._board.placePiece(this._myColor, x, y);
+    _placePiece(x: number, y: number){
+        if (this._board!.getCurrentTurnColor() == this._myColor) this._board!.placePiece(this._myColor!, x, y);
     }
     
     _conced(){
-        if (this._board.getCurrentTurnColor() == this._myColor) this._board.conced(this._myColor);
+        if (this._board!.getCurrentTurnColor() == this._myColor) this._board!.conced(this._myColor!);
     }
 }

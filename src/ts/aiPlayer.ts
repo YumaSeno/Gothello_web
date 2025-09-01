@@ -1,46 +1,49 @@
+
 'use strict';
-import { _PlayerInterface } from "./player.js"
+import { _PlayerInterface } from "./player"
+import { PieceColor, PieceState } from "./common/const";
+import { Board } from "./board";
 
 export class AIPlayer extends _PlayerInterface{
-    constructor(name, myColor, board){
+    constructor(name: string, myColor: PieceColor, board: Board){
         super(name, myColor, board);
         setTimeout(()=>this._placePiece(4,4), 500);
 
         board.addEventListnerOnPlacesPiece((x, y) => {
-            if (this._board.getCurrentTurnColor() !== this._myColor) return;
-            if (this._board.isSettled()) return;
+            if (this._board!.getCurrentTurnColor() !== this._myColor) return;
+            if (this._board!.isSettled()) return;
             // ユーザエクスペリエンスのため
             setTimeout(()=>this._placePieceInTheBestPlaces(), 500);
         });
     }
 
-    _placePiece(x, y){
-        if (this._board.getCurrentTurnColor() == this._myColor) this._board.placePiece(this._myColor, x, y);
+    _placePiece(x: number, y: number){
+        if (this._board!.getCurrentTurnColor() == this._myColor) this._board!.placePiece(this._myColor!, x, y);
     }
     
     _conced(){
-        if (this._board.getCurrentTurnColor() == this._myColor) this._board.conced(this._myColor);
+        if (this._board!.getCurrentTurnColor() == this._myColor) this._board!.conced(this._myColor!);
     }
 
     /**
      * 一番良い手を探して打つ。
      */
     _placePieceInTheBestPlaces(){
-        const playerColor = this._myColor;
+        const playerColor = this._myColor!;
 
-        const board = this._board.getBoardCopy();
+        const board = this._board!.getBoardCopy();
         
         let maxEval = -9999;
-        const places = [];
+        const places: {x: number, y: number, eval: number}[] = [];
         
         for (let x = 0; x < board.length; x++) {
             for (let y = 0; y < board[x].length; y++) {
                 if(this._isIsolate(board, x, y)) continue;
 
-                const boardClone = this._board.getBoardClone(board);
-                if(!this._board.placePieceSimulate(boardClone, playerColor, x, y)) continue;
+                const boardClone = this._board!.getBoardClone(board);
+                if(!this._board!.placePieceSimulate(boardClone, playerColor, x, y)) continue;
                 
-                if(this._board.isVictory(boardClone, playerColor) !== null){
+                if(this._board!.isVictory(boardClone, playerColor) !== null){
                     this._placePiece(x, y);
                     return;
                 }
@@ -60,7 +63,7 @@ export class AIPlayer extends _PlayerInterface{
         }
         */
         
-        const bestPlaces = [];
+        const bestPlaces: {x: number, y: number, eval: number}[] = [];
         for (const place of places) {
             if(place.eval == maxEval) bestPlaces.push(place);
         }
@@ -77,32 +80,32 @@ export class AIPlayer extends _PlayerInterface{
      * @param {*} isMe 自分が打つ手か否か。再帰的に呼び出す際に反転する。
      * @returns 一番良い手
      */
-    _getBestEval(board, depth, isMe = false){
-        const playerColor = isMe ? this._myColor : this._board.getOpponentColor(this._myColor);
-        const opponentColor = this._board.getOpponentColor(playerColor);
+    _getBestEval(board: PieceState[][], depth: number, isMe = false): number{
+        const playerColor = isMe ? this._myColor! : this._board!.getOpponentColor(this._myColor!);
+        const opponentColor = this._board!.getOpponentColor(playerColor);
 
-        const evals = [];
+        const evals: number[] = [];
         
         for (let x = 0; x < board.length; x++) {
             for (let y = 0; y < board[x].length; y++) {
                 if(this._isIsolate(board, x, y)) continue;
 
-                const boardClone = this._board.getBoardClone(board);
-                if(!this._board.placePieceSimulate(boardClone, playerColor, x, y)) continue;
+                const boardClone = this._board!.getBoardClone(board);
+                if(!this._board!.placePieceSimulate(boardClone, playerColor, x, y)) continue;
 
-                if(this._board.isPieceFiveLinedUp(boardClone, x, y)){
+                if(this._board!.isPieceFiveLinedUp(boardClone, x, y)){
                     return isMe ? 1000 : -1000 - depth;
                 }
                 
                 if (depth === 0){
-                    evals.push(this._evalNode(boardClone, this._myColor));
+                    evals.push(this._evalNode(boardClone, this._myColor!));
                 }else{
                     evals.push(this._getBestEval(boardClone, depth - 1, !isMe));
                 }
             }
         }
 
-        if(evals.count <= 0){
+        if(evals.length <= 0){
             return isMe ? -1000 : 1000;
         }
 
@@ -122,18 +125,18 @@ export class AIPlayer extends _PlayerInterface{
      * @param playerColor 評価基準のプレイヤーの駒の色
      * @returns 
      */
-    _evalNode(board, playerColor){
-        const opponentColor = this._board.getOpponentColor(playerColor);
+    _evalNode(board: PieceState[][], playerColor: PieceColor): number{
+        const opponentColor = this._board!.getOpponentColor(playerColor);
 
         let evalNum = 0;
         
         for (let x = 0; x < board.length; x++) {
             for (let y = 0; y < board[x].length; y++) {
-                const num = ((board[x][y] - 1) % 2) + 1;
-                if(num === playerColor){
+                const pieceColor = PieceColor.byPieceState(board[x][y]);
+                if(pieceColor === playerColor){
                     evalNum++;
                     if(x == 4 && y == 4) evalNum += 0.5;
-                }else if(num === opponentColor){
+                }else if(pieceColor === opponentColor){
                     evalNum--;
                     if(x == 4 && y == 4) evalNum -= 0.5;
                 }
@@ -148,7 +151,7 @@ export class AIPlayer extends _PlayerInterface{
      * @param board ボードの2次元配列
      * @returns 
      */
-    _isIsolate(board, x, y){
+    _isIsolate(board: PieceState[][], x: number, y: number): boolean{
         const directions = [0,1,-1];
         for (const dire_y of directions) {
             for (const dire_x of directions) {

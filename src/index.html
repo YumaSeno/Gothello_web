@@ -28,8 +28,10 @@
             <div id="games_inner">
                 <div class="game_selector" id="show_help">ヘルプを見る</div>
                 <div class="game_selector" id="offline_mode">ローカル対戦</div>
-                <div class="game_selector" id="ai_mode">AI対戦</div>
-                <div class="game_selector" id="aiai_mode">AI同士対戦</div>
+                <div class="game_selector" id="ai_mode">AI(単純モデル)対戦</div>
+                <div class="game_selector" id="aiai_mode">AI(単純モデル)同士対戦</div>
+                <div class="game_selector" id="ai_dq_mode">AI(深層Q学習)対戦</div>
+                <div class="game_selector" id="aiai_dq_mode">AI(深層Q学習)同士対戦</div>
                 <div class="game_selector" id="free_online_mode">フリーマッチ</div>
                 <div class="game_selector" id="private_start">プライベートマッチを作成</div>
                 <div class="game_selector" id="private_join">プライベートマッチに参加</div>
@@ -73,6 +75,5 @@
             document.documentElement.style.setProperty('--vmin', (width>height ? height : width)/100+"px");
         })();
     </script>
-    <script src="./js/main.js" type="module"></script>
 </body>
 </html>

@@ -1,8 +1,9 @@
+
 'use strict';
 
 export const API = {
 
-    call(apiName, data = {}, callback = (response)=>{}){
+    call(apiName: string, data: Record<string, any> = {}, callback: (response: any) => void = (response)=>{}){
         const _xhr = new XMLHttpRequest();
 
         _xhr.onreadystatechange = function()
@@ -37,7 +38,7 @@ export const API = {
         trySend();
     },
     
-    _encodeHTMLForm( data ){
+    _encodeHTMLForm( data: Record<string, any> ){
         var params = [];
         for( var name in data )
         {

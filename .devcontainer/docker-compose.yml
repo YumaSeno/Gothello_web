@@ -1,0 +1,15 @@
+services:
+  gothello_web:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+      args:
+        CONTAINER_USER: vscode
+        CONTAINER_WORKDIR: /workspace
+    network_mode: "host"
+    volumes:
+      - ..:/workspace
+    command: /bin/bash
+    tty: true
+    stdin_open: true
+    privileged: true

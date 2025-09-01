@@ -1,0 +1,31 @@
+{
+  "name": "gothello_web",
+  "version": "1.0.0",
+  "description": "Original boardgame",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "webpack --mode=development && tsc",
+    "start": "webpack serve --mode=development"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/commander": "^2.12.0",
+    "@types/node": "^20.14.9",
+    "commander": "^14.0.0",
+    "copy-webpack-plugin": "^13.0.1",
+    "html-webpack-plugin": "^5.6.4",
+    "nodemon": "^3.1.4",
+    "ts-loader": "^9.5.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2",
+    "webpack": "^5.101.3",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs": "^4.22.0",
+    "@tensorflow/tfjs-node": "^4.22.0"
+  }
+}
